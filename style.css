@@ -553,63 +553,68 @@ body.dark-mode .thumbnails-row img { background: #333; border-color: #444; }
     .container { padding: 0 15px; }
     h2 { font-size: 1.5rem; }
 
-    /* HEADER : On force l'alignement, le wrap est inutile ici si on joue sur les largeurs */
-    .header-container { 
-        display: flex; 
-        flex-wrap: nowrap; 
-        align-items: center; 
-        justify-content: space-between; 
-        height: var(--header-height); 
-        padding: 0 10px; 
-        gap: 8px; 
-    }
+    /* HEADER - Réajustement sans "order" pour éviter les disparitions */
+    .header-container { flex-wrap: nowrap; height: var(--header-height); padding: 0 10px; gap: 8px; }
     
-    /* Menu Burger : On le force en premier */
-    .menu-burger { order: 1; }
+    /* Logo : on fixe une taille pour éviter qu'il ne s'écrase */
+    .logo-wrapper { min-width: 85px; margin-left: 0; }
+    .logo-wrapper img { max-height: 48px; }
     
-    /* Logo : Déplacé en position 2, taille réduite pour laisser la place à la recherche */
-    .logo-wrapper { order: 2; min-width: 50px; margin-right: 5px; }
-    .logo-wrapper img { max-height: 30px; width: auto; }
-    
-    /* Recherche : Priorité maximale (flex 1) en position 3 */
-    .search-container { 
-        order: 3; 
-        flex: 1; 
-        min-width: 0; /* Important pour éviter le dépassement */
-        margin: 0 5px; 
-    } 
-    .search-input-wrapper { padding: 6px 10px; }
+    /* Recherche : on retire "order" et on laisse flex: 1 prendre l'espace disponible naturellement */
+    .search-container { flex: 1; max-width: 100%; margin: 0; } 
+    .search-input-wrapper { padding: 6px 12px; }
 
-    /* Catalogue, Modales, Checkout, Footer (inchangés) */
+    /* Catalogue (Portrait) */
     .product-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
     .related-products-section { padding: 20px 15px; }
+    
+    /* Modale Produit */
     .size-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .size-btn { font-size: 0.8rem; padding: 8px 4px; }
     .modal-details { padding: 15px; }
+
+    /* CHECKOUT MOBILE */
     .checkout-grid { grid-template-columns: 1fr; padding: 15px; gap: 20px; }
     .checkout-form-col { order: 1; }
     .checkout-summary-col { order: 2; margin-bottom: 20px; }
     .form-group input, .form-group select { padding: 8px; font-size: 0.9rem; }
+    
+    /* Footer */
     .footer-cols { grid-template-columns: 1fr; }
     .footer-col { margin-bottom: 20px; }
+    
+    /* Modales texte */
     .text-modal .modal-content div[id^="content-"] { max-height: 75vh; padding: 15px; }
+
+    /* Fix image produit mobile */
     .product-image-wrapper { width: 100%; aspect-ratio: 1 / 1; background-color: #f4f4f4; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
     .product-image-wrapper img { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; }
-    .category-badge, span[style*="background:black"], span[style*="background:#ff6600"] { font-size: 0.6rem !important; padding: 2px 5px !important; top: 5px !important; left: 5px !important; right: auto !important; max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+    
+    /* Badges mobile */
+    .category-badge, span[style*="background:black"], span[style*="background:#ff6600"] { 
+        font-size: 0.6rem !important; padding: 2px 5px !important; top: 5px !important; left: 5px !important;
+        right: auto !important; max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+    }
     .product-image-wrapper span:nth-of-type(2) { top: 25px !important; }
+
+    /* Info produit mobile */
     .product-info { padding: 8px 5px !important; }
     .product-brand { font-size: 0.7rem !important; margin-bottom: 2px; }
     .product-title { font-size: 0.85rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
     .product-price { font-size: 0.95rem !important; }
     .add-btn-mini { width: 25px; height: 25px; font-size: 1rem; line-height: 25px; }
+    
+    /* Checkout Promo Code Mobile */
     .promo-code-container { width: 100%; display: flex; gap: 5px; }
     .promo-code-container input#promo-code-input { flex: 4; max-width: 80%; }
     .promo-code-container button#apply-promo-btn { flex: 1; min-width: 50px; padding: 8px; }
+    
+    /* Checkout Paiement Mobile */
     .payment-method-selector { display: flex; flex-wrap: wrap; gap: 5px; }
     .payment-method-selector .pay-btn-select { flex: 1 1 48%; margin: 0; padding: 10px 5px; font-size: 0.85rem; text-align: center; }
 }
 
-/* --- 14b. OPTIMISATIONS MODE PAYSAGE (LANDSCAPE) --- */
+/* --- 14b. OPTIMISATION MODE PAYSAGE (LANDSCAPE) --- */
 @media (max-width: 1024px) and (orientation: landscape) {
     /* 1. On force les produits à rester petits pour en mettre 4 ou 5 par ligne */
     .product-grid {
@@ -638,12 +643,10 @@ body.dark-mode .thumbnails-row img { background: #333; border-color: #444; }
 @media (max-width: 480px) {
     .header-container { padding: 0 10px; }
     
-    /* CORRECTIF LOGO : Réduit pour éviter l'écrasement de la barre de recherche */
-    .logo-wrapper { min-width: 60px; }
-    .logo-wrapper img { max-height: 35px !important; }
-    
-    /* RECHERCHE : Suppression de la largeur fixe pour permettre l'adaptation */
-    .search-container { flex: 1; max-width: 100%; margin: 5px 0; }
+    /* CORRECTIF LOGO : On assure une visibilité maximale même sur petit écran */
+    .logo-wrapper { min-width: 90px; }
+    .logo-wrapper img { max-height: 50px !important; }
+    .search-container { max-width: 140px; margin: 0 5px; }
 
     .drawer-content { max-width: 100%; }
     #mobile-filter-drawer .drawer-content { max-width: 90%; }

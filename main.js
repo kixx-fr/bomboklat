@@ -9,7 +9,7 @@ const CONFIG = {
 
     getAuthUrl: function(params = new URLSearchParams()) {
         const separator = this.API_URL.includes('?') ? '&' : '?';
-        const secret = 'Bomboklatt'; 
+        const secret = 'Bomboklatt2K26'; 
         return `${this.API_URL}${separator}auth=${secret}&${params.toString()}`;
     },
 
@@ -939,24 +939,21 @@ function openProductModal(product) {
 
     const productImg = (product.images && product.images.length > 0) ? product.images[0] : 'assets/placeholder.jpg';
     
-    // On appelle directement sans condition pour voir l'erreur exacte dans la console si elle existe
-    boostMySEO(product.model, product.seoDesc || product.description, product.price, productImg);
-
-    // Appel de la fonction dédiée pour garantir une URL d'image absolue (https://kixx.fr/...)
+    // CORRECTIF : On ajoute le 5ème paramètre (seoTitle) pour l'automatisation
     if (typeof boostMySEO === 'function') {
-        const productImg = (product.images && product.images.length > 0) ? product.images[0] : 'assets/placeholder.jpg';
         boostMySEO(
             product.model, 
             product.seoDesc || product.description, 
             product.price, 
-            productImg
+            productImg,
+            product.seoTitle // <-- Ajout du titre optimisé ici
         );
     } else {
-        // Fallback si boostMySEO est absente (mais avec correction manuelle de l'URL absolue)
+        // Fallback si boostMySEO est absente
         const productSchema = document.createElement('script');
         productSchema.id = 'product-schema';
         productSchema.type = 'application/ld+json';
-        const absoluteImg = window.location.origin + '/' + ((product.images && product.images.length > 0) ? product.images[0] : 'assets/placeholder.jpg');
+        const absoluteImg = window.location.origin + '/' + productImg;
         productSchema.text = JSON.stringify({
             "@context": "https://schema.org/",
             "@type": "Product",
@@ -975,14 +972,17 @@ function openProductModal(product) {
         document.head.appendChild(productSchema);
     }
 
-    document.title = product.seoTitle || product.model;
+    // Mise à jour du titre de l'onglet (Priorité à la colonne V)
+    document.title = product.seoTitle || (product.model + " | KICKS - Shop");
+    
     const metaTitle = document.getElementById('meta-title');
     if(metaTitle) metaTitle.innerText = product.seoTitle || product.model;
+    
     const metaDesc = document.getElementById('meta-description');
-    if (metaDesc) metaDesc.setAttribute('content', product.seoDesc || "");
+    if (metaDesc) metaDesc.setAttribute('content', product.seoDesc || product.description || "");
 
     const newUrl = window.location.origin + window.location.pathname + '?product=' + encodeURIComponent(product.id);
-    window.history.pushState({ productId: product.id }, product.seoTitle, newUrl);
+    window.history.pushState({ productId: product.id }, product.seoTitle || product.model, newUrl);
 
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute('href', newUrl);
@@ -995,8 +995,12 @@ function openProductModal(product) {
         const mainCont = document.createElement('div');
         mainCont.className = 'main-image-container';
         mainCont.style.cssText = "position:relative; overflow:hidden; border-radius:8px;";
+        
         const mainImg = document.createElement('img');
-        mainImg.id = 'modal-img-main'; mainImg.src = images[0];
+        mainImg.id = 'modal-img-main'; 
+        mainImg.src = images[0];
+        // CORRECTIF SEO : Ajout d'un alt dynamique pour Google Images
+        mainImg.alt = product.model + " - Vue principale";
         mainCont.appendChild(mainImg);
         
         if (!isMobileOrTablet()) {
@@ -1014,6 +1018,8 @@ function openProductModal(product) {
             let currentIdx = 0;
             const updateImg = () => {
                 mainImg.src = images[currentIdx];
+                // Mise à jour de l'alt lors du changement d'image
+                mainImg.alt = `${product.model} - Vue ${currentIdx + 1}`;
                 document.querySelectorAll('.thumbnails-row img').forEach((t, i) => t.classList.toggle('active', i === currentIdx));
             };
             const createArrow = (dir) => {
@@ -1029,14 +1035,22 @@ function openProductModal(product) {
             mainCont.appendChild(prev); mainCont.appendChild(next);
         }
 
-        const thumbs = document.createElement('div'); thumbs.className = 'thumbnails-row';
+        const thumbs = document.createElement('div'); 
+        thumbs.className = 'thumbnails-row';
         galleryContainer.append(mainCont, thumbs);
+        
         const showImage = (idx) => {
             mainImg.src = images[idx];
+            mainImg.alt = `${product.model} - Vue ${idx + 1}`;
             thumbs.querySelectorAll('img').forEach((img, i) => img.classList.toggle('active', i === idx));
         };
+        
         images.forEach((src, idx) => {
-            const t = document.createElement('img'); t.src = src; t.onclick = () => showImage(idx);
+            const t = document.createElement('img'); 
+            t.src = src; 
+            // CORRECTIF SEO : Alt sur les miniatures
+            t.alt = `${product.model} miniature ${idx + 1}`;
+            t.onclick = () => showImage(idx);
             thumbs.appendChild(t);
         });
         showImage(0);
@@ -1060,7 +1074,8 @@ function openProductModal(product) {
     
     const descBox = document.getElementById('modal-desc');
     if (descBox) {
-        descBox.innerHTML = product.description || "Aucune description disponible.";
+        // CORRECTIF : Priorité à la description SEO si disponible pour la cohérence contenu/SEO
+        descBox.innerHTML = product.seoDesc || product.description || "Aucune description disponible.";
     }
     
     // --- GESTION DU PRIX ET DU BADGE PAYPAL 4X (AJOUT CHIRURGICAL) ---
@@ -1160,7 +1175,10 @@ function openProductModal(product) {
         }
     }
     
-    renderRelatedProducts(product.related_products ? product.related_products.split(',') : []);
+    // CORRECTIF : Remplacement de l'appel manuel par l'automatisation intelligente
+    // On n'utilise plus product.related_products (colonne Sheets), on laisse le script choisir les meilleurs modèles
+    displayRelatedProducts(product);
+    
     openPanel(modal);
     
     if(isMobileOrTablet()) {
@@ -2902,25 +2920,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 // --- OPTIMISATION SEO DYNAMIQUE KICKS ---
-function boostMySEO(productName, description, price, imageUrl) {
-  // 1. Mise à jour du Titre et de la Meta Description
-  document.title = productName + " | KICKS - Shop";
+function boostMySEO(productName, description, price, imageUrl, seoTitle) {
+  // 1. Mise à jour du Titre (Colonne V) et de la Meta Description (Colonne W)
+  // On utilise seoTitle s'il existe, sinon on garde le format par défaut
+  document.title = seoTitle || (productName + " | KICKS - Shop");
+  
   let metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute("content", description);
+  if (metaDesc) {
+    metaDesc.setAttribute("content", description);
+  }
 
   // 2. CORRECTION SEO : On crée l'URL complète pour Google
   const absoluteImageUrl = (window.location.origin + "/" + imageUrl).replace(/ /g, '%20');
 
   // 3. Injection du JSON-LD (Product Schema)
   let existingSchema = document.getElementById('product-schema');
-  if (existingSchema) existingSchema.remove();
+  if (existingSchema) {
+    existingSchema.remove();
+  }
 
   let schema = {
     "@context": "https://schema.org/",
     "@type": "Product",
-    "name": productName,
+    "name": productName, // Google préfère le nom réel du produit ici
     "image": [absoluteImageUrl], 
-    "description": description,
+    "description": description, // Utilise ta colonne W optimisée
     "offers": {
       "@type": "Offer",
       "priceCurrency": "EUR",
@@ -2944,21 +2968,35 @@ function forceFeedGoogle() {
     seoTunnel.id = 'bot-tunnel';
     
     // On y injecte des mots-clés sémantiques liés à ton inventaire
+    // Optimisation : Ajout de la dimension performance et locale (Guadeloupe/Antilles)
     seoTunnel.innerHTML = `
         <h2>Achat Sneakers Authentiques KICKS</h2>
-        <p>Large choix de Jordan, Yeezy, Nike Dunk et exclusivités. 
-           Vérification d'authenticité par nos experts, livraison express 
-           et service client premium.</p>
+        <p>Large choix de Jordan,Nike , Peak Flash et exclusivités basketball performance. 
+           Produits Authentiques, livraison express 24/48h en Guadeloupe 
+          Service client premium aux Antilles et en France.</p>
     `;
     document.body.prepend(seoTunnel);
 }
 function polishImageSEO() {
     document.querySelectorAll('img').forEach(img => {
+        // On intervient seulement si la balise alt est vide ou absente
         if (!img.alt || img.alt === "") {
-            // On récupère le titre de la page ou le nom du produit pour l'alt
-            const context = document.querySelector('h1')?.innerText || "Sneaker KICKS";
+            // CORRECTIF : On cherche le titre le plus pertinent (H1, titre modal ou titre de page)
+            const context = document.querySelector('h1')?.innerText || 
+                            document.getElementById('modal-title')?.innerText || 
+                            document.title.split('|')[0].trim() || 
+                            "Sneaker KICKS";
+
+            // Injection des attributs SEO optimisés
+            // On ajoute des termes sémantiques pour favoriser Google Images
             img.setAttribute('alt', context + " - Vue détaillée Authentic KICKS");
             img.setAttribute('title', context + " - KICKS Shop");
+            
+            // OPTIMISATION SUPPLÉMENTAIRE : On force le décodage asynchrone pour la performance
+            img.decoding = "async";
+            
+            // On s'assure que l'image est bien marquée comme appartenant au shop pour le crawling
+            img.setAttribute('itemprop', 'image');
         }
     });
 }
@@ -3005,3 +3043,56 @@ document.addEventListener('submit', async (e) => {
         }
     }
 });
+/**
+ * AUTOMATISATION DES SUGGESTIONS DE PRODUITS
+ * Cette fonction filtre le catalogue par marque et catégorie,
+ * mélange les résultats et utilise createProductCard pour l'affichage.
+ */
+function displayRelatedProducts(currentProduct) {
+    const container = document.getElementById('related-products-grid');
+    const section = document.getElementById('related-products-section');
+    
+    // Sécurité : on vérifie que les éléments HTML et les données produits existent
+    if (!container || !section || !state.products) {
+        console.warn("⚠️ SEO Suggestions : Conteneur ou produits introuvables.");
+        return;
+    }
+
+    // 1. FILTRE : On cherche les produits de la même marque, en excluant le produit actuel
+    let related = state.products.filter(p => 
+        p.brand === currentProduct.brand && p.id !== currentProduct.id
+    );
+
+    // 2. COMPLÉMENT : Si on a moins de 4 résultats, on ajoute des produits de la même catégorie
+    if (related.length < 4) {
+        const extra = state.products.filter(p => 
+            p.category === currentProduct.category && 
+            p.id !== currentProduct.id && 
+            !related.some(r => r.id === p.id)
+        );
+        related = [...related, ...extra];
+    }
+
+    // 3. MÉLANGE : On trie aléatoirement et on ne garde que les 4 premiers
+    const shuffled = related.sort(() => 0.5 - Math.random()).slice(0, 4);
+
+    // 4. NETTOYAGE ET INJECTION
+    container.innerHTML = ''; // On vide proprement les anciennes suggestions
+
+    if (shuffled.length > 0) {
+        shuffled.forEach((product, index) => {
+            // On appelle ta fonction exacte. L'index (index + 10) sert pour le lazy-loading.
+            const card = createProductCard(product, index + 10);
+            container.appendChild(card);
+        });
+        
+        // On affiche la section si elle était cachée
+        section.classList.remove('hidden');
+        section.style.display = 'block'; 
+        console.log("✅ SEO Suggestions : 4 modèles injectés automatiquement.");
+    } else {
+        // Si vraiment rien n'est trouvé, on cache la section pour ne pas faire moche
+        section.classList.add('hidden');
+        section.style.display = 'none';
+    }
+}

@@ -538,16 +538,16 @@ body.dark-mode .thumbnails-row img { background: #333; border-color: #444; }
     .container { padding: 0 15px; }
     h2 { font-size: 1.5rem; }
 
-    /* HEADER */
-    .header-container { flex-wrap: nowrap; height: var(--header-height); padding: 0 15px; }
+    /* HEADER - Réajustement sans "order" pour éviter les disparitions */
+    .header-container { flex-wrap: nowrap; height: var(--header-height); padding: 0 10px; gap: 8px; }
     
-    /* CORRECTIF LOGO : Largeur minimale garantie et hauteur augmentée */
-    .logo-wrapper { min-width: 100px; flex-shrink: 0; margin-left: 10px; order: 2; }
-    .logo-wrapper img { max-height: 55px; width: auto; }
+    /* Logo : on fixe une taille pour éviter qu'il ne s'écrase */
+    .logo-wrapper { min-width: 85px; margin-left: 0; }
+    .logo-wrapper img { max-height: 48px; }
     
-    /* Réduction barre de recherche pour laisser de la place au logo */
-    .search-container { flex: 1; max-width: 180px; margin: 0 10px; order: 3; } 
-    .search-input-wrapper { padding: 6px 10px; }
+    /* Recherche : on retire "order" et on laisse flex: 1 prendre l'espace disponible naturellement */
+    .search-container { flex: 1; max-width: 100%; margin: 0; } 
+    .search-input-wrapper { padding: 6px 12px; }
 
     /* Catalogue (Portrait) */
     .product-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }

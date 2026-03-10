@@ -277,20 +277,8 @@ body.dark-mode #mobile-menu-trigger {
     position: absolute; top: 15px; right: 15px; z-index: 100; cursor: pointer;
     transition: all 0.2s ease; line-height: 0; color: #111; border: none;
 }
-/* Correction de visibilité pour le mode sombre */
-body.dark-mode .close-modal, 
-body.dark-mode .close-drawer {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.25) !important; /* Augmentation du contraste du fond */
-    border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Ajout d'un contour pour la distinction */
-}
-
-/* Forçage spécifique pour les icônes SVG si utilisées dans ces boutons */
-body.dark-mode .close-modal svg, 
-body.dark-mode .close-drawer svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-}
+.close-modal:hover, .close-drawer:hover { background: rgba(0, 0, 0, 0.2); transform: rotate(90deg); }
+body.dark-mode .close-modal, body.dark-mode .close-drawer { color: #ffffff; background: rgba(255, 255, 255, 0.15); }
 
 /* --- 7. DRAWER PANIER & FILTRES MOBILES --- */
 .drawer-content {
@@ -1141,22 +1129,4 @@ body.dark-mode .paypal-4x-badge {
     padding: 15px 15px 35px 15px !important; /* Le 35px en bas remonte le bouton */
     border-top: 1px solid #eee !important;
     width: 100% !important;
-}
-/* FORCE VISIBILITÉ CROIX DARK MODE */
-body.dark-mode .close-modal, 
-body.dark-mode .close-drawer {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.3) !important;
-    border: 2px solid #ffffff !important; /* Bordure épaisse pour créer un contraste net */
-    opacity: 1 !important;
-    visibility: visible !important;
-    z-index: 99999 !important;
-}
-
-body.dark-mode .close-modal svg, 
-body.dark-mode .close-drawer svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-    stroke-width: 2px !important; /* Épaissit le trait de la croix */
-    display: block !important;
 }

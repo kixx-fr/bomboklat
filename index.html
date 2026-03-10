@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="description" content="Découvres la sélection de sneakers sur kixx.fr (KICKS). Des modèles stylés pour tous les jours, une livraison rapide en 48H et une authenticité garantie sur chaque paire." id="meta-description">
+	<title id="meta-title">KICKS | Sélection Sneakers Basketball & Streetwear - Site Officiel kixx.fr</title>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "KICKS",
+      "url": "https://kixx.fr/",
+      "logo": "https://kixx.fr/assets/boutique-sneakers-kicks-kixx-fr.png",
+      "description": "Le shop ultime de sneakers : Jordan, Nike . Authentique.",
+      "acceptedPaymentMethod": [
+        "https://schema.org/CreditCard",
+        "https://schema.org/PayPal",
+        "https://schema.org/Klarna",
+        "https://schema.org/BankTransfer"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "FR"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://kixx.fr/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <link rel="preconnect" href="https://kicks.kazabasket.workers.dev">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="canonical" href="https://kixx.fr/">
+
+	<link rel="icon" type="image/png" href="/assets/boutique-sneakers-kicks-kixx-fr-favicon-48.png" sizes="48x48">
+	<link rel="icon" type="image/png" href="/assets/boutique-sneakers-kicks-kixx-fr-favicon-192.png" sizes="192x192">
+	<link rel="apple-touch-icon" href="/assets/boutique-sneakers-kicks-kixx-fr-favicon-180.png">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="KICKS - Sneakers Shop kixx.fr">
+    <meta property="og:description" content="kixx.fr spécialisé en sneakers et Chaussures Basketball. Authenticité garantie.">
+    <meta property="og:image" content="assets/boutique-sneakers-kicks-kixx-fr.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="KICKS - Sneakers & Hype">
+    <meta name="twitter:image" content="assets/boutique-sneakers-kicks-kixx-fr.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* === STYLES GDT & RESPONSIVE === */
+        :root{
+          --men-color:#007bff; 
+          --women-color:#e83e8c; 
+          --kids-color:#28a745; 
+          --men-bg:#e6f3ff;
+          --women-bg:#fdeff5;
+          --kids-bg:#e9fceb;
+        }
+        
+        .section-title{
+            margin-top:20px; margin-bottom:10px; font-weight:800; 
+            font-size:18px; padding: 8px 12px; border-radius: 6px;
+            border: 1px solid; display: inline-block; min-width: 250px;
+        }
+        .section-title[data-cat="men"]{ color:var(--men-color); background-color:var(--men-bg); border-color:var(--men-color); }
+        .section-title[data-cat="women"]{ color:var(--women-color); background-color:var(--women-bg); border-color:var(--women-color); }
+        .section-title[data-cat="kids"]{ color:var(--kids-color); background-color:var(--kids-bg); border-color:var(--kids-color); }
+
+        .table td[data-label^="EU"], 
+        .table td[data-label^="Longueur"] {
+            font-weight: 700; color: var(--text-primary); background-color: var(--bg-secondary);
+        }
+        .table td:nth-child(4) { 
+            font-weight: 700; color: var(--text-primary); background-color: transparent !important; 
+        }
+        .table td:nth-child(1) {
+            background-color: var(--bg-secondary) !important; font-weight: 800;
+        }
+
+        /* Responsive Table GDT */
+        @media (max-width: 520px) {
+            .gdt-view .table-wrap { overflow-x: hidden; }
+            .gdt-view .table { min-width: 100%; border: none; }
+            .gdt-view .table thead { display: none; }
+            .gdt-view .table, .gdt-view .table tbody, .gdt-view .table tr, .gdt-view .table td { display: block; width: 100%; }
+            .gdt-view .table tr { margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+            .gdt-view .table td { text-align: right; padding-left: 50%; position: relative; border: none; border-bottom: 1px solid #eee; }
+            .gdt-view .table td:last-child { border-bottom: none; }
+            .gdt-view .table td::before {
+                content: attr(data-label) ':'; position: absolute; left: 10px; width: 45%; padding-right: 10px;
+                white-space: nowrap; text-align: left; font-weight: 700; color: var(--text-primary);
+            }
+            .gdt-view .table tr[data-cat="men"] td::before { color: var(--men-color); }
+            .gdt-view .table tr[data-cat="women"] td::before { color: var(--women-color); }
+            .gdt-view .table tr[data-cat="kids"] td::before { color: var(--kids-color); }
+            .gdt-view .table td[data-label^="EU"], .gdt-view .table td[data-label^="Longueur"] { background-color: transparent !important; }
+        }
+        
+        @media (max-width: 1024px) {
+            .modal-content { height: 100%; max-height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            #product-modal .modal-content { padding-bottom: 80px; }
+        }
+    </style>
+</head>
+
+<body data-api-url="https://kicks.kazabasket.workers.dev/api/main">
+
+    <div class="top-bar">
+        <div class="marquee-content">
+            <span>🚀 LIVRAISON GRATUITE DÈS 150€ Guadeloupe,Martinique,Guyane Francaise• PAIEMENT 3X DISPONIBLE Klarna,• AUTHENTICITÉ GARANTIE</span>
+            <span>PAIEMENT 4X Paypal DISPONIBLE • Livraison Gratuite 24H-48h – Qualité Authentique 🏀</span>
+        </div>
+    </div>
+
+    <header id="main-header">
+        <div class="header-container container">
+            
+            <div class="logo-wrapper">
+                <a href="#" onclick="window.location.reload();">
+                    <img src="assets/boutique-sneakers-kicks-kixx-fr.png" alt="Kicks" class="logo-light" width="180" height="60" fetchpriority="high">
+                    <img src="assets/boutique-sneakers-kicks-kixx-fr.png" alt="Kicks Dark" class="logo-dark" width="180" height="60">
+                </a>
+            </div>
+
+            <div class="mobile-controls">
+                <button id="mobile-menu-trigger" aria-label="Filtres Mobile" class="hidden">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="search-input" placeholder="Rechercher (ex: Jordan 4...)" autocomplete="off">
+                    <button id="search-btn" aria-label="Rechercher">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="search-results" class="search-dropdown hidden"></div>
+            </div>
+
+            <div class="header-actions">
+                <button id="theme-toggle" aria-label="Changer Thème">
+                    <svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="icon-moon hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+
+                <button id="cart-trigger" aria-label="Panier">
+                    <div class="cart-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span id="cart-count" class="cart-badge hidden">0</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+        
+        <div id="filters-bar" class="filters-scroll"></div>
+    </header>
+
+	<main id="main-content">
+        <section id="category-hero-section" style="display:none;">
+            <div id="category-hero-content"></div>
+        </section>
+
+        <section class="catalog-section">
+            <div class="container">
+                <div class="catalog-header">
+                    <h2 id="catalog-title">Collection Sneakers</h2>
+                    <span id="result-count" class="text-muted">Chargement...</span>
+                </div>
+
+                <div id="product-grid" class="product-grid">
+                    <div class="product-card skeleton"><div class="sk-image"></div><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:30%"></div></div>
+                    <div class="product-card skeleton"><div class="sk-image"></div><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:30%"></div></div>
+                    <div class="product-card skeleton"><div class="sk-image"></div><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:30%"></div></div>
+                    <div class="product-card skeleton"><div class="sk-image"></div><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:30%"></div></div>
+                </div>
+
+                <div id="load-more-trigger" class="load-trigger">
+                    <div class="loader-spinner hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-section">
+            <div class="container">
+                <h3></h3>
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/LCkKDee-HHs" title="KICKS Video" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+	<div id="cart-drawer" class="drawer">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3>Mon Panier (<span id="cart-qty">0</span>)</h3>
+                <button class="close-drawer" aria-label="Fermer">&times;</button>
+            </div>
+            
+            <div class="drawer-body">
+                <div id="cart-items"></div>
+            </div>
+
+            <div class="drawer-footer">
+                <div class="cart-total">
+                    <span style="font-weight:600;">Total</span>
+                    <span id="cart-total-price" style="font-weight:700; font-size:1.1rem;">0.00 €</span>
+                </div>
+                <button id="checkout-trigger-btn" class="btn-primary full-width">VALIDER LA COMMANDE</button>
+            </div>
+        </div>
+        <div class="drawer-overlay"></div>
+    </div>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Fermer">&times;</button>
+            <div class="product-modal-grid">
+                <div class="modal-gallery">
+                    <div class="main-image-container">
+                        <img id="modal-img-main" src="" alt="Produit">
+                    </div>
+                    <div id="modal-thumbnails" class="thumbnails-row"></div>
+                </div>
+                
+                <div class="modal-details">
+                    <span id="modal-brand" class="product-brand">MARQUE</span>
+                    <h2 id="modal-title">Nom du Modèle</h2>
+                    
+                    <div id="modal-price-container">
+                        <p id="modal-price" class="product-price">0.00 €</p>
+                    </div>
+                    
+                    <div class="product-description">
+                        <p id="modal-desc" style="margin: 15px 0; color:var(--text-secondary); line-height:1.5;">Description...</p>
+                    </div>
+
+                    <div class="selectors">
+                        <div class="selector-group" style="margin-bottom:15px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                                <label style="font-weight:600; font-size:0.9rem;">Taille</label>
+                                <button id="trigger-gdt" style="text-decoration:underline; font-size:0.8rem; color:var(--text-secondary);">Guide des tailles</button>
+                            </div>
+                            <div id="modal-sizes" class="size-grid"></div>
+                        </div>
+
+                        <div class="selector-group" style="margin-bottom:20px;">
+                            <label style="font-weight:600; font-size:0.9rem; display:block; margin-bottom:5px;">Quantité</label>
+                            <input type="number" id="modal-qty" value="1" min="1" max="5" style="padding:10px; width:60px; border:1px solid var(--border-color); border-radius:4px; text-align:center;">
+                        </div>
+                    </div>
+
+                    <button id="add-to-cart-btn" class="btn-primary full-width">AJOUTER AU PANIER</button>
+                    <div id="stock-warning" class="stock-alert hidden" style="color:red; margin-top:10px; font-size:0.9rem;"></div>
+                </div>
+            </div>
+            
+            <div id="related-products-section" class="related-products-section hidden">
+                <h3>D’autres modèles qui méritent ton attention…</h3>
+                <div id="related-products-grid" class="product-grid related-grid"></div>
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+
+    <div id="modal-gdt" class="modal">
+        <div class="modal-content gdt-view">
+            <button class="close-modal" aria-label="Fermer">&times;</button>
+            <div class="gdt-wrapper">
+                <header class="gdt-internal-header">
+                    <h1>👟 Choisis ta taille idéale selon ta marque préférée</h1>
+                    <p>Guide KICKS . Mesure ton pied (talon → orteils) en cm et trouve la correspondance.</p>
+                    <div class="controls" id="controls"></div>
+                </header>
+               
+                <div class="gdt-layout-grid">
+                    <main id="mainArea"></main>
+                    <aside class="preview">
+                        <a href="https://kixx.fr" class="preview-link">
+                            <img id="logoImage" src="assets/logot.png" alt="Logo KICKS" class="logo-image"> 
+                            <div class="brand-title" id="brandTitle">Nike</div>
+                        </a>
+                        <div class="note" id="brandNote">Astuce : mesure ton pied en cm — choisis la taille dont la longueur est égale ou légèrement supérieure.</div>
+                        <div class="legend"><span></span><span></span></div>
+                    </aside>
+                </div>
+              
+                <div class="footer" style="color:#555; text-align:center; margin-top:20px; font-size:14px;">© 2026 KICKS — Guide indicatif. Vérifie la fiche modèle pour précision.</div>
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+    
+    <div id="modal-avis" class="modal text-modal">
+        <div class="modal-content" style="max-width: 100%; height: 90vh;">
+            <button class="close-modal" aria-label="Fermer">&times;</button>
+            <div style="padding:40px; text-align:center;">Chargement des avis...</div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+
+    <div id="modal-checkout" class="modal">
+        <div class="modal-content" style="max-width: 900px; height: auto; max-height: 90vh;">
+            <button class="close-modal" aria-label="Fermer">&times;</button>
+            
+            <div class="checkout-grid">
+                <div class="checkout-form-col">
+                    <form id="checkout-form">
+                        <div class="checkout-section">
+    <h4>👤 Coordonnées</h4>
+    <div class="form-group">
+        <label for="ck-email">Email *</label>
+        <input type="email" id="ck-email" name="email" required placeholder="email@exemple.com">
+    </div>
+    <div style="display:flex; gap:10px;">
+        <div class="form-group" style="flex:1;">
+            <label for="ck-prenom">Prénom *</label>
+            <input type="text" id="ck-prenom" name="first_name" required>
+        </div>
+        <div class="form-group" style="flex:1;">
+            <label for="ck-nom">Nom *</label>
+            <input type="text" id="ck-nom" name="last_name" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="ck-tel">Téléphone (Suivi) *</label>
+        <input type="tel" id="ck-tel" name="phone" required placeholder="06..." inputmode="tel">
+    </div>
+</div>
+
+<div class="checkout-section">
+    <h4>📍 Adresse de Livraison</h4>
+    <div class="form-group">
+        <label for="ck-pays">Pays</label>
+        <select id="ck-pays" name="country">
+            <option value="" disabled selected>Sélectionnez votre pays</option>
+            <option value="FR">France</option>
+            <option value="BE">Belgique</option>
+            <option value="CH">Suisse</option>
+            <option value="LU">Luxembourg</option>
+            </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="ck-adresse">Adresse *</label>
+        <input type="text" id="ck-adresse" name="address" required placeholder="Numéro et Rue">
+    </div>
+  
+    <div style="display:flex; gap:10px; position:relative;">
+        <div class="form-group" style="flex:1;">
+            <label for="ck-cp">Code Postal *</label>
+            <input type="text" id="ck-cp" name="zip_code" required inputmode="numeric">
+        </div>
+        <div class="form-group" style="flex:2;">
+            <label for="ck-ville">Ville *</label>
+            <input type="text" id="ck-ville" name="city" required>
+        </div>
+        <ul id="cp-suggestions" class="hidden"></ul> 
+    </div>
+</form> </div>
+<div class="checkout-summary-col">
+    <div class="checkout-section">
+        <h4>🚚 Livraison</h4>
+        <div class="shipping-options" id="shipping-options-container">
+            <div style="color:#666; font-style:italic;">Veuillez renseigner votre pays et code postal...</div>
+        </div>
+    </div>
+</div>
+
+                    <div class="checkout-summary">
+                        <div class="summary-row"><span>Sous-total</span><span id="checkout-subtotal">0.00 €</span></div>
+                        <div class="summary-row"><span>Livraison</span><span id="checkout-shipping">0.00 €</span></div>
+                        <div id="discount-row" class="summary-row summary-discount hidden" style="color:#2e7d32;"><span>Remise</span><span id="checkout-discount">- 0.00 €</span></div>
+                        <div id="fees-row" class="summary-row hidden" style="color:var(--error-color);"><span>Frais</span><span id="checkout-fees">+ 0.00 €</span></div>
+                        <div class="summary-total"><span>TOTAL</span><span id="checkout-total">0.00 €</span></div>
+
+                        <div style="margin: 20px 0 10px;">
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Paiement</label>
+                            <div class="payment-method-selector">
+                                <button class="pay-btn-select selected" data-method="CARD">💳 Carte</button>
+                                <button class="pay-btn-select" data-method="PAYPAL_4X">🅿️ PayPal 4X</button>
+                                <button class="pay-btn-select" data-method="KLARNA">🌸 Klarna</button>
+                                <button class="pay-btn-select" data-method="VIREMENT">🏦 Virement</button>
+                            </div>
+                        </div>
+
+                        <div class="promo-code-container" style="display:flex; gap:5px; margin-bottom:15px;">
+                            <input type="text" id="promo-code-input" placeholder="Code Promo" autocomplete="off" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
+                            <button id="apply-promo-btn">OK</button>
+                        </div>
+                        <div id="promo-message" style="font-size:0.8rem; margin-bottom:10px;"></div>
+
+                        <div class="g-recaptcha" style="margin-bottom:15px;"></div>
+
+                        <div class="payment-actions">
+                            <button type="button" id="btn-pay-stripe" class="btn-primary"><span id="btn-pay-label">💳 Payer par Carte</span></button>
+                            <div id="paypal-button-container" class="hidden" style="margin-top:10px;"></div>
+                            <button type="button" id="btn-pay-virement" class="btn-pay-virement" style="width:100%; padding:15px; background:#6b4f4f; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:10px;">💶 Confirmer le Virement</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+    
+    <div id="modal-cgv" class="modal text-modal"><div class="modal-content"><button class="close-modal">&times;</button><h2>CGV</h2><div id="content-cgv">Chargement...</div></div><div class="modal-overlay"></div></div>
+    <div id="modal-mentions" class="modal text-modal"><div class="modal-content"><button class="close-modal">&times;</button><h2>Mentions</h2><div id="content-mentions">Chargement...</div></div><div class="modal-overlay"></div></div>
+    <div id="modal-paypal4x" class="modal text-modal"><div class="modal-content"><button class="close-modal">&times;</button><h2>Paiement 4x PayPal</h2><div id="content-paypal4x">Chargement...</div></div><div class="modal-overlay"></div></div>
+    <div id="modal-klarna" class="modal text-modal"><div class="modal-content"><button class="close-modal">&times;</button><h2>Paiement Klarna</h2><div id="content-klarna">Chargement...</div></div><div class="modal-overlay"></div></div>
+
+    <div id="modal-livraison" class="modal text-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2>Livraison</h2>
+            <div id="content-livraison">Chargement...</div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+    
+    <div id="mobile-filter-drawer" class="drawer">
+    <div class="drawer-content" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="drawer-header">
+            <h3>Filtres & Options</h3>
+            <button class="close-drawer" aria-label="Fermer" onclick="closeDrawer('mobile-filter-drawer')">&times;</button>
+        </div>
+
+        <div id="mobile-filters-content" class="drawer-body" style="flex: 1; overflow-y: auto; padding: 15px;">
+            <p style="text-align: center; color: var(--text-muted);">Chargement des filtres...</p>
+        </div>
+
+        <div class="drawer-footer" style="padding: 15px; background: #fff; border-top: 1px solid #eee;">
+            <button id="apply-filters-mobile-btn" class="btn-primary full-width" style="height: 55px; font-weight: bold;">
+                APPLIQUER LES FILTRES
+            </button>
+        </div>
+    </div>
+    <div class="drawer-overlay" onclick="closeDrawer('mobile-filter-drawer')"></div>
+</div>
+
+    <footer id="main-footer">
+        <div class="container footer-container">
+            <div class="footer-cols">
+                <div class="footer-col">
+                    <h4>Informations</h4>
+                    <ul>
+                        <li><button data-modal="modal-livraison">Livraison</button></li>
+                        <li><button data-modal="modal-cgv">CGV</button></li>
+                        <li><button data-modal="modal-mentions">Mentions Légales</button></li>
+                        <li><button data-modal="modal-paypal4x">Paiement 4x PayPal</button></li>
+                        <li><button data-modal="modal-klarna">Paiement Klarna</button></li>
+                        <li><button data-modal="modal-avis">Avis Clients</button></li>
+                        <li><button data-modal="modal-faq" id="btn-faq-footer">FAQ</button></li>
+                        <li><a href="https://www.laposte.fr/outils/suivre-vos-envois" target="_blank">Suivre ma commande</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col newsletter-col">
+                    <h4>Newsletter</h4>
+                    <p style="font-size:0.8rem; margin-bottom:10px; color:var(--text-secondary);">Inscris-toi pour des offres exclusives.</p>
+                    <form id="newsletter-form" style="display:flex; flex-direction:column; gap:10px;">
+                        <input type="text" name="prenom" placeholder="Prénom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                        <input type="text" name="nom" placeholder="Nom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                        <input type="email" name="email" placeholder="Email" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                        <button type="submit" class="btn-primary" style="margin-top:5px; padding:10px;">S'INSCRIRE</button>
+                    </form>
+                </div>
+            </div>
+            
+            <hr style="border:0; border-top:1px solid var(--border-color); margin:30px 0;">
+            
+            <div class="footer-payment-info" style="text-align:center;">
+                <div class="payment-icons">
+                    <a href="https://stripe.com/fr/privacy" target="_blank" aria-label="Confidentialité Stripe"><img src="assets/stripe.png" alt="Stripe"></a>
+                    <a href="https://www.visa.fr/legal/global-privacy-notice.html" target="_blank" aria-label="Conditions Visa"><img src="assets/visa.png" alt="Visa"></a>
+                    <a href="https://www.mastercard.fr/fr-fr/vision/ce-que-nous-faisons/confidentialite.html" target="_blank" aria-label="Conditions Mastercard"><img src="assets/mastercard.png" alt="Mastercard"></a>
+                    <a href="https://www.paypal.com/fr/webapps/mpp/ua/privacy-full" target="_blank" aria-label="Confidentialité PayPal"><img src="assets/paypal.png" alt="PayPal"></a>
+                    <a href="https://payments.google.com/payments/apis-secure/get_legal_document?ldo=0&ldt=privacynotice&ldl=fr" target="_blank" aria-label="Confidentialité Google Pay"><img src="assets/googlepay.png" alt="Google Pay"></a>
+                    <a href="https://www.apple.com/fr/legal/privacy/data/fr/apple-pay/" target="_blank" aria-label="Confidentialité Apple Pay"><img src="assets/applepay.png" alt="Apple Pay"></a>
+                    <a href="https://www.klarna.com/fr/confidentialite/" target="_blank" aria-label="Confidentialité Klarna"><img src="assets/klarna.png" alt="Klarna"></a>
+                </div>
+                <div class="payment-legal-text" style="font-size:0.75rem; color:var(--text-muted); margin-top:15px; line-height:1.4;">
+                    <p>🔒 <strong>Paiement 100% Sécurisé</strong> : Toutes les transactions sont chiffrées via protocole SSL et certifiées 3D Secure.</p>
+                    <p style="margin-top:5px;">
+                        💳 <strong>Paiement en 4X</strong> : Facilités de paiement :Paiement en plusieurs fois (PayPal 4x / Klarna). Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager.
+                        <a href="https://www.paypalobjects.com/marketing/ua/pdf/FR/fr/pay-in-4x-full.pdf" target="_blank" style="text-decoration:underline;">Voir conditions</a>
+                    </p>
+                </div>
+                <div class="recaptcha-legal" style="margin-top:20px; font-size:0.7rem; opacity:0.6;">
+                    Protected by reCAPTCHA. 
+                    <a href="https://policies.google.com/privacy" target="_blank">Privacy</a> - 
+                    <a href="https://policies.google.com/terms" target="_blank">Terms</a>
+                </div>
+                <p class="copyright" style="margin-top:30px; font-weight:600;">&copy; 2026 KICKS. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/+590690366198" target="_blank" class="whatsapp-float" aria-label="Contact WhatsApp">
+        <img src="assets/whatsapp.png" alt="WhatsApp">
+    </a>
+
+    <div id="cookie-consent-modal" class="cookie-modal hidden">
+        <div class="cookie-content">
+            <h3>🍪 On respecte ta vie privée </h3>
+            <p>On utilise des cookies pour assurer le bon fonctionnement du site (Panier, Paiements Sécurisés) et pour mesurer notre audience.</p>
+            
+            <div id="cookie-details" class="hidden" style="margin: 15px 0; text-align: left; font-size: 0.85rem;">
+                <div class="cookie-option">
+                    <input type="checkbox" id="cookie-necessary" checked disabled>
+                    <label for="cookie-necessary"><strong>Essentiels (Obligatoire)</strong><br><span style="color:#666">Panier, Stripe, PayPal, Klarna, reCAPTCHA (Sécurité).</span></label>
+                </div>
+                <div class="cookie-option" style="margin-top:10px;">
+                    <input type="checkbox" id="cookie-analytics">
+                    <label for="cookie-analytics"><strong>Analytiques (Google)</strong><br><span style="color:#666">Nous aide à améliorer le site (Anonyme).</span></label>
+                </div>
+            </div>
+
+            <div class="cookie-actions">
+                <button id="cookie-settings-btn" style="text-decoration: underline; font-size: 0.8rem; color: #555;">Personnaliser</button>
+                <div class="main-cookie-btns">
+                    <button id="cookie-reject-btn" class="btn-secondary">Refuser</button>
+                    <button id="cookie-accept-btn" class="btn-primary">ACCEPTER TOUT</button>
+                </div>
+            </div>
+            <button id="cookie-save-btn" class="btn-primary full-width hidden" style="margin-top:10px;">ENREGISTRER MES CHOIX</button>
+        </div>
+    </div>
+
+<script src="main.js" type="text/javascript"></script>
+<script>
+  // --- KICKS ULTIMATE SEO ENGINE ---
+  window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id') || urlParams.get('product');
+
+    if (productId) {
+      // MODE PRODUIT : On laisse le main.js appeler boostMySEO(currentProduct)
+      console.log('🚀 SEO : Mode Produit Détecté - Injection des Data...');
+    } else {
+      // MODE CATALOGUE : On blinde l'accueil pour que Google voit tout le shop
+      console.log('🏪 SEO : Mode Catalogue KICKS activé');
+      
+      const shopSchema = {
+        "@context": "https://schema.org",
+        "@type": "Store",
+        "name": "KICKS",
+        "url": "https://kixx.fr/",
+        "logo": "https://kixx.fr/assets/boutique-sneakers-kicks-kixx-fr.png",
+        "description": "Le shop ultime de sneakers : Jordan, Nike . Authentique.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "FR"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://kixx.fr/?search={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      };
+
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify(shopSchema);
+      document.head.appendChild(script);
+      
+      // On lance aussi le tunnel de mots-clés
+      if (typeof forceFeedGoogle === "function") forceFeedGoogle();
+    }
+  });
+</script>
+<script>
+  // Dynamise la balise canonique pour éviter les erreurs de "Doublons"
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentProd = urlParams.get('product');
+  let canonicalURL = "https://kixx.fr/";
+  if (currentProd) {
+    canonicalURL += "?product=" + currentProd;
+  }
+  let link = document.querySelector("link[rel='canonical']");
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', canonicalURL);
+</script>
+
+<div style="position: fixed; bottom: 5px; right: 5px; opacity: 0.1; z-index: 9999;">
+    <a href="https://search.google.com/search-console/insights" target="_blank" style="color: #888; text-decoration: none;">.</a>
+</div>
+
+<script>
+function loadHeavyScripts() {
+      if (window.scriptsLoaded) return;
+      
+      // On vérifie si CONFIG est bien chargé avant de lancer, sinon on attend
+      if (typeof CONFIG === 'undefined') {
+          setTimeout(loadHeavyScripts, 500);
+          return;
+      }
+
+      // OPTIMISATION : On attend que le navigateur soit au repos pour ne pas bloquer les images
+      const launch = () => {
+          if (window.scriptsLoaded) return;
+          console.log("📦 Chargement différé optimisé : Stripe, PayPal, reCAPTCHA, GTAG");
+
+          // 1. STRIPE
+          const stripeScript = document.createElement('script');
+          stripeScript.src = "https://js.stripe.com/v3/";
+          stripeScript.async = true;
+          document.head.appendChild(stripeScript);
+
+          // 2. PAYPAL (Ajouté ici pour libérer le réseau au démarrage)
+          const paypalScript = document.createElement('script');
+          paypalScript.src = "https://www.paypal.com/sdk/js?client-id=AbnlV0YxtcxZADz9TpbUiWUBSOJSRLiirt8rq4LFuG5PeRBnT7CB6DM6rOrLBwzSrlcSaMGG7ADDK1Fy&currency=EUR&components=buttons,messages&enable-funding=paylater";
+          paypalScript.async = true;
+          document.head.appendChild(paypalScript);
+
+          // 3. RECAPTCHA (Version Stable pour chargement différé)
+          const siteKey = "6LdxFA4sAAAAAGi_sahJ3mfLrh4jsFWNXW8cfY2v";
+          
+          // On crée une div invisible si elle n'existe pas, pour que Google trouve sa clé
+          if (!document.querySelector('.g-recaptcha')) {
+              const div = document.createElement('div');
+              div.className = 'g-recaptcha';
+              div.style.display = 'none';
+              div.setAttribute('data-sitekey', siteKey);
+              div.setAttribute('data-size', 'invisible');
+              document.body.appendChild(div);
+          }
+
+          const recaptchaScript = document.createElement('script');
+          // On force le chargement explicite
+          recaptchaScript.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+          recaptchaScript.async = true;
+          recaptchaScript.defer = true;
+          document.head.appendChild(recaptchaScript);
+
+          // 4. GOOGLE ANALYTICS
+          const gtagScript = document.createElement('script');
+          gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-EH4FT890SE";
+          gtagScript.async = true;
+          gtagScript.onload = () => {
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                'analytics_storage': 'granted',
+                'ad_storage': 'granted',
+                'wait_for_update': 500
+              });
+              gtag('js', new Date());
+              gtag('config', 'G-EH4FT890SE');
+          };
+          document.head.appendChild(gtagScript);
+
+          window.scriptsLoaded = true;
+      };
+
+      // Si le navigateur est compatible, on attend un moment d'inactivité, sinon délai de 2s
+      if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => setTimeout(launch, 1000));
+      } else {
+          setTimeout(launch, 2000);
+      }
+  }
+
+  // Initialisation au chargement du DOM
+  window.addEventListener('DOMContentLoaded', loadHeavyScripts);
+</script>
+
+</body>
+</html>

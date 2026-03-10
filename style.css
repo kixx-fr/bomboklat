@@ -71,7 +71,7 @@ h1, h2, h3, h4 { font-family: 'Oswald', sans-serif; text-transform: uppercase; m
 .hidden { display: none !important; }
 .full-width { width: 100%; }
 
-/* --- 4. TOP BAR & HEADER --- */
+/* --- 4. TOP BAR & HEADER (CORRIGÉ) --- */
 .top-bar {
     background-color: var(--accent-color); color: var(--accent-text);
     padding: 8px 0; font-size: 0.8rem; font-weight: 600;
@@ -86,24 +86,32 @@ h1, h2, h3, h4 { font-family: 'Oswald', sans-serif; text-transform: uppercase; m
     position: sticky; top: 0; z-index: 1000;
     background-color: var(--bg-color); border-bottom: 1px solid var(--border-color);
 }
-.header-container { display: flex; justify-content: space-between; align-items: center; height: var(--header-height); }
+.header-container { display: flex; justify-content: space-between; align-items: center; height: var(--header-height); padding: 0 15px; }
 
 /* Logo */
-.logo-wrapper { min-width: 140px; display: flex; align-items: center; }
-.logo-wrapper img { max-height: 55px; width: auto; object-fit: contain; }
+.logo-wrapper { min-width: 80px; display: flex; align-items: center; }
+.logo-wrapper img { max-height: 45px; width: auto; object-fit: contain; }
 body:not(.dark-mode) .logo-light { display: block; }
 body:not(.dark-mode) .logo-dark { display: none; }
 body.dark-mode .logo-light { display: none; }
 body.dark-mode .logo-dark { display: block; }
 
-/* Recherche PC */
+/* Recherche PC et MOBILE (Correction visibilité) */
 .mobile-controls { display: none; } 
-.search-container { flex: 1; max-width: 500px; margin: 0 30px; position: relative; }
+.search-container { flex: 1; max-width: 500px; margin: 0 15px; position: relative; }
 .search-input-wrapper {
     display: flex; align-items: center; background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color); border-radius: 50px; padding: 8px 20px;
+    border: 1px solid var(--border-color); border-radius: 50px; padding: 6px 15px;
 }
-.search-input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); }
+.search-input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); min-width: 0; }
+
+/* Correction DARK MODE pour les icônes */
+body.dark-mode .header-actions i,
+body.dark-mode .header-actions svg,
+body.dark-mode #mobile-menu-trigger {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
 
 .search-dropdown, #search-results {
     position: absolute; top: 120%; left: 0; width: 100%;
@@ -116,11 +124,18 @@ body.dark-mode .logo-dark { display: block; }
 .search-result-item img { width: 50px; height: 50px; margin-right: 15px; object-fit: cover; }
 
 /* Actions Header */
-.header-actions { display: flex; gap: 15px; align-items: center; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
 .cart-icon-wrapper { position: relative; }
 .cart-badge {
     position: absolute; top: -5px; right: -5px; background-color: var(--error-color);
     color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 10px;
+}
+
+/* --- RE-ACTIVATION MOBILE (Indispensable pour le menu) --- */
+@media (max-width: 768px) {
+    .mobile-controls { display: block !important; }
+    .search-container { margin: 0 10px; }
+    .logo-wrapper { min-width: 60px; }
 }
 
 /* Filtres PC */

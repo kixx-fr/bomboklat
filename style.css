@@ -1142,3 +1142,21 @@ body.dark-mode .paypal-4x-badge {
     border-top: 1px solid #eee !important;
     width: 100% !important;
 }
+/* FORCE VISIBILITÉ CROIX DARK MODE */
+body.dark-mode .close-modal, 
+body.dark-mode .close-drawer {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    border: 2px solid #ffffff !important; /* Bordure épaisse pour créer un contraste net */
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 99999 !important;
+}
+
+body.dark-mode .close-modal svg, 
+body.dark-mode .close-drawer svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+    stroke-width: 2px !important; /* Épaissit le trait de la croix */
+    display: block !important;
+}

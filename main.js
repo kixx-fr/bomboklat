@@ -5,8 +5,7 @@
 /* --- 1. CONFIGURATION GLOBALE --- */
 const CONFIG = {
     API_URL: document.body ? document.body.getAttribute('data-api-url') || "" : "",
-    BOT_SECRET: "Gabidioule1982chouPy", 
-
+    
     getAuthUrl: function(params = new URLSearchParams()) {
         const separator = this.API_URL.includes('?') ? '&' : '?';
         const secret = 'Bomboklatt2K26'; 
@@ -3023,17 +3022,28 @@ document.addEventListener('submit', async (e) => {
         const url = CONFIG.getAuthUrl(new URLSearchParams(data));
 
         try {
-            await fetch(url, { method: 'POST', mode: 'no-cors' });
+            // Suppression de 'no-cors' pour pouvoir lire la réponse du Worker
+            const response = await fetch(url, { method: 'POST' });
+            const result = await response.json(); 
 
-            // Affichage du succès
+            // Choix du message selon le retour de l'Apps Script
+            let textMsg = `MERCI ${data.prenom.toUpperCase()} ! <br> Inscription validée. ⚡`;
+            
+            if (result.message === "Déjà inscrit !") {
+                textMsg = `HELLO ${data.prenom.toUpperCase()} ! <br> Tu es déjà dans l'équipe. 😉`;
+            }
+
+            // Affichage du message (succès ou déjà inscrit)
             form.innerHTML = `<div id="success-msg" style="color:#00ff00; padding:20px; border:1px solid #00ff00; text-align:center; font-weight:bold;">
-                MERCI ${data.prenom.toUpperCase()} ! <br> Inscription validée. ⚡
+                ${textMsg}
             </div>`;
 
             // RÉINITIALISATION APRÈS 5 SECONDES
             setTimeout(() => {
                 form.innerHTML = originalContent;
-                form.reset(); // Vide les champs
+                // On récupère la nouvelle instance du formulaire après injection du innerHTML
+                const refreshedForm = document.getElementById('newsletter-form');
+                if (refreshedForm) refreshedForm.reset(); 
             }, 5000);
 
         } catch (err) {
@@ -3096,3 +3106,95 @@ function displayRelatedProducts(currentProduct) {
         section.style.display = 'none';
     }
 }
+/* =================================================================
+    🔍 GESTION FAQ DYNAMIQUE AVEC RECHERCHE
+================================================================= */
+async function loadFAQ() {
+    const faqContainer = document.getElementById('faq-container');
+    if (!faqContainer) return;
+
+    // Ajout de la barre de recherche au-dessus du conteneur
+    faqContainer.innerHTML = `
+        <div style="margin-bottom: 20px; position: relative;">
+            <input type="text" id="faq-search" placeholder="UNE QUESTION ? TAPEZ UN MOT-CLÉ (EX: LIVRAISON)..." 
+                style="width: 100%; padding: 15px; border: 2px solid #000; font-family: inherit; font-weight: bold; text-transform: uppercase; outline: none; border-radius:0;">
+        </div>
+        <div id="faq-list"></div>
+    `;
+
+    const faqList = document.getElementById('faq-list');
+
+    try {
+        const url = CONFIG.getAuthUrl(new URLSearchParams({ action: 'getFAQ' }));
+        const response = await fetch(url);
+        const faqs = await response.json();
+
+        if (!faqs || faqs.length === 0) {
+            faqList.innerHTML = "<p style='text-align:center; padding:20px;'>Aucune question trouvée pour le moment.</p>";
+            return;
+        }
+
+        const renderFaqs = (filteredFaqs) => {
+            faqList.innerHTML = filteredFaqs.map((item) => `
+                <div class="faq-item" style="border-bottom: 1px solid #eee; margin-bottom: 5px; background:#fff;">
+                    <button class="faq-question" style="width: 100%; text-align: left; padding: 18px 15px; background: none; border: none; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-size: 13px; font-family:inherit;">
+                        <span style="padding-right:10px;">${item.question}</span>
+                        <span class="icon" style="font-size:18px;">+</span>
+                    </button>
+                    <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background-color: #f9f9f9;">
+                        <p style="padding: 15px; line-height: 1.6; color: #444; margin:0; font-size:14px; border-left:3px solid #000;">${item.reponse}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.faq-question').forEach(button => {
+                button.onclick = function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('.icon');
+                    
+                    document.querySelectorAll('.faq-answer').forEach(other => {
+                        if (other !== answer) {
+                            other.style.maxHeight = null;
+                            other.previousElementSibling.querySelector('.icon').innerText = '+';
+                        }
+                    });
+
+                    if (answer.style.maxHeight && answer.style.maxHeight !== "0px") {
+                        answer.style.maxHeight = null;
+                        icon.innerText = '+';
+                    } else {
+                        answer.style.maxHeight = answer.scrollHeight + "px";
+                        icon.innerText = '-';
+                    }
+                };
+            });
+        };
+
+        renderFaqs(faqs);
+
+        document.getElementById('faq-search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = faqs.filter(f => 
+                f.question.toLowerCase().includes(term) || 
+                f.reponse.toLowerCase().includes(term)
+            );
+            renderFaqs(filtered);
+        });
+
+    } catch (err) {
+        console.error("Erreur FAQ:", err);
+        faqList.innerHTML = "<p style='text-align:center; color:red;'>Erreur de connexion au serveur.</p>";
+    }
+}
+
+// --- DÉCLENCHEUR SPÉCIFIQUE POUR TON BOUTON FOOTER ---
+document.addEventListener('DOMContentLoaded', () => {
+    const btnFaq = document.getElementById('btn-faq-footer');
+    if (btnFaq) {
+        btnFaq.addEventListener('click', () => {
+            // On laisse un micro-délai (100ms) pour que la modale s'affiche 
+            // avant de calculer les hauteurs scrollHeight
+            setTimeout(loadFAQ, 100);
+        });
+    }
+});

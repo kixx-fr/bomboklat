@@ -429,27 +429,115 @@
     <div id="modal-klarna" class="modal text-modal"><div class="modal-content"><button class="close-modal">&times;</button><h2>Paiement Klarna</h2><div id="content-klarna">Chargement...</div></div><div class="modal-overlay"></div></div>
 
     <div id="modal-livraison" class="modal text-modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <h2>Livraison</h2>
-            <div id="content-livraison">Chargement...</div>
-        </div>
-        <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <button class="close-modal">&times;</button>
+        <h2>Livraison</h2>
+        <div id="content-livraison">Chargement...</div>
     </div>
-    
-    <div id="mobile-filter-drawer" class="drawer">
+    <div class="modal-overlay"></div>
+</div>
+
+<div id="modal-faq" class="modal text-modal">
+    <div class="modal-content" style="max-width: 850px; padding: 0; border-radius: 12px; overflow: hidden; border: 1px solid #333; background: #fff;">
+        
+        <button class="close-modal" aria-label="Fermer" onclick="closeModal('modal-faq')" style="z-index: 10; color: #fff; background: #000; border-radius: 50%; width: 35px; height: 35px; top: 15px; right: 15px; display: flex; align-items: center; justify-content: center; opacity: 1; border: 2px solid #ff6600; cursor: pointer;">&times;</button>
+        
+        <div style="background: #000; padding: 45px 30px; color: #fff; border-bottom: 5px solid #ff6600;">
+            <h2 style="font-family: 'Oswald', sans-serif; text-transform: uppercase; font-weight: 800; font-size: 2.5rem; letter-spacing: -1px; margin: 0; line-height: 1;">
+                QUESTIONS <span style="color: #ff6600;">FRÉQUENTES</span>
+            </h2>
+            <p style="opacity: 0.8; font-size: 0.9rem; margin-top: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">Centre d'aide KICKS - Sneakers & Streetwear</p>
+        </div>
+
+        <div style="padding: 25px; background: #fff;">
+            <div style="margin-bottom: 30px; position: relative;">
+                <input type="text" id="faq-search" placeholder="TAPE UN MOT-CLÉ (LIVRAISON, RETOUR...)" 
+                       style="width: 100%; padding: 18px 25px; border: 2px solid #000; font-family: 'Inter', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-radius: 0; outline: none; transition: all 0.3s;">
+                <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-weight: 900; color: #ff6600; font-size: 1.2rem;">🔍</div>
+            </div>
+
+            <style>
+                /* Sécurité anti-doublon : cache toute barre de recherche injectée dynamiquement dans le container */
+                #faq-container input[type="text"], 
+                #faq-container .search-box,
+                #faq-container .faq-search-bar { display: none !important; }
+
+                .faq-container { display: flex; flex-direction: column; gap: 10px; }
+                .faq-item { 
+                    border: 1px solid #eee; 
+                    transition: all 0.2s ease;
+                    background: #f9f9f9;
+                }
+                .faq-item:hover { border-color: #ff6600; background: #fff; transform: translateX(4px); }
+                .faq-item.active { border-color: #000; border-left: 6px solid #ff6600; background: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+                .faq-question {
+                    width: 100%;
+                    padding: 22px 25px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    text-align: left;
+                }
+                .faq-question span {
+                    font-family: 'Inter', sans-serif;
+                    font-weight: 800;
+                    font-size: 0.85rem;
+                    color: #000;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .faq-icon-box {
+                    width: 24px;
+                    height: 24px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    color: #ff6600;
+                    transition: transform 0.3s ease;
+                }
+                .faq-item.active .faq-icon-box { transform: rotate(45deg); color: #000; }
+                
+                .faq-answer {
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.4s ease;
+                }
+                .faq-answer-content {
+                    padding: 0 25px 25px 25px;
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    color: #444;
+                    border-top: 1px solid #f5f5f5;
+                    padding-top: 15px;
+                }
+                .faq-item.active .faq-answer { max-height: 1000px; }
+            </style>
+
+            <div id="faq-container" class="faq-container">
+                <p style="text-align: center; padding: 20px; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px;">Chargement des données KICKS...</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" onclick="closeModal('modal-faq')"></div>
+</div>
+
+<div id="mobile-filter-drawer" class="drawer">
     <div class="drawer-content" style="display: flex; flex-direction: column; height: 100%;">
         <div class="drawer-header">
-            <h3>Filtres & Options</h3>
+            <h3 style="text-transform: uppercase; font-weight: 800;">Filtres & Options</h3>
             <button class="close-drawer" aria-label="Fermer" onclick="closeDrawer('mobile-filter-drawer')">&times;</button>
         </div>
-
         <div id="mobile-filters-content" class="drawer-body" style="flex: 1; overflow-y: auto; padding: 15px;">
-            <p style="text-align: center; color: var(--text-muted);">Chargement des filtres...</p>
+            <p style="text-align: center; color: var(--text-muted);">Chargement...</p>
         </div>
-
         <div class="drawer-footer" style="padding: 15px; background: #fff; border-top: 1px solid #eee;">
-            <button id="apply-filters-mobile-btn" class="btn-primary full-width" style="height: 55px; font-weight: bold;">
+            <button id="apply-filters-mobile-btn" class="btn-primary full-width" style="height: 55px; font-weight: bold; background: #ff6600; color: #fff; border: none; cursor: pointer;">
                 APPLIQUER LES FILTRES
             </button>
         </div>
@@ -457,64 +545,73 @@
     <div class="drawer-overlay" onclick="closeDrawer('mobile-filter-drawer')"></div>
 </div>
 
-    <footer id="main-footer">
-        <div class="container footer-container">
-            <div class="footer-cols">
-                <div class="footer-col">
-                    <h4>Informations</h4>
-                    <ul>
-                        <li><button data-modal="modal-livraison">Livraison</button></li>
-                        <li><button data-modal="modal-cgv">CGV</button></li>
-                        <li><button data-modal="modal-mentions">Mentions Légales</button></li>
-                        <li><button data-modal="modal-paypal4x">Paiement 4x PayPal</button></li>
-                        <li><button data-modal="modal-klarna">Paiement Klarna</button></li>
-                        <li><button data-modal="modal-avis">Avis Clients</button></li>
-                        <li><button data-modal="modal-faq" id="btn-faq-footer">FAQ</button></li>
-                        <li><a href="https://www.laposte.fr/outils/suivre-vos-envois" target="_blank">Suivre ma commande</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col newsletter-col">
-                    <h4>Newsletter</h4>
-                    <p style="font-size:0.8rem; margin-bottom:10px; color:var(--text-secondary);">Inscris-toi pour des offres exclusives.</p>
-                    <form id="newsletter-form" style="display:flex; flex-direction:column; gap:10px;">
-                        <input type="text" name="prenom" placeholder="Prénom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                        <input type="text" name="nom" placeholder="Nom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                        <input type="email" name="email" placeholder="Email" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
-                        <button type="submit" class="btn-primary" style="margin-top:5px; padding:10px;">S'INSCRIRE</button>
-                    </form>
-                </div>
+<footer id="main-footer">
+    <div class="container footer-container">
+        <div class="footer-cols">
+            <div class="footer-col">
+                <h4>Informations</h4>
+                <ul>
+                    <li><button data-modal="modal-livraison">Livraison</button></li>
+                    <li><button data-modal="modal-cgv">CGV</button></li>
+                    <li><button data-modal="modal-mentions">Mentions Légales</button></li>
+                    <li><button data-modal="modal-paypal4x">Paiement 4x PayPal</button></li>
+                    <li><button data-modal="modal-klarna">Paiement Klarna</button></li>
+                    <li><button data-modal="modal-avis">Avis Clients</button></li>
+                    <li><button data-modal="modal-faq" id="btn-faq-footer">FAQ</button></li>
+                    <li><a href="https://www.laposte.fr/outils/suivre-vos-envois" target="_blank">Suivre ma commande</a></li>
+                </ul>
             </div>
             
-            <hr style="border:0; border-top:1px solid var(--border-color); margin:30px 0;">
-            
-            <div class="footer-payment-info" style="text-align:center;">
-                <div class="payment-icons">
-                    <a href="https://stripe.com/fr/privacy" target="_blank" aria-label="Confidentialité Stripe"><img src="assets/stripe.png" alt="Stripe"></a>
-                    <a href="https://www.visa.fr/legal/global-privacy-notice.html" target="_blank" aria-label="Conditions Visa"><img src="assets/visa.png" alt="Visa"></a>
-                    <a href="https://www.mastercard.fr/fr-fr/vision/ce-que-nous-faisons/confidentialite.html" target="_blank" aria-label="Conditions Mastercard"><img src="assets/mastercard.png" alt="Mastercard"></a>
-                    <a href="https://www.paypal.com/fr/webapps/mpp/ua/privacy-full" target="_blank" aria-label="Confidentialité PayPal"><img src="assets/paypal.png" alt="PayPal"></a>
-                    <a href="https://payments.google.com/payments/apis-secure/get_legal_document?ldo=0&ldt=privacynotice&ldl=fr" target="_blank" aria-label="Confidentialité Google Pay"><img src="assets/googlepay.png" alt="Google Pay"></a>
-                    <a href="https://www.apple.com/fr/legal/privacy/data/fr/apple-pay/" target="_blank" aria-label="Confidentialité Apple Pay"><img src="assets/applepay.png" alt="Apple Pay"></a>
-                    <a href="https://www.klarna.com/fr/confidentialite/" target="_blank" aria-label="Confidentialité Klarna"><img src="assets/klarna.png" alt="Klarna"></a>
-                </div>
-                <div class="payment-legal-text" style="font-size:0.75rem; color:var(--text-muted); margin-top:15px; line-height:1.4;">
-                    <p>🔒 <strong>Paiement 100% Sécurisé</strong> : Toutes les transactions sont chiffrées via protocole SSL et certifiées 3D Secure.</p>
-                    <p style="margin-top:5px;">
-                        💳 <strong>Paiement en 4X</strong> : Facilités de paiement :Paiement en plusieurs fois (PayPal 4x / Klarna). Un crédit vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager.
-                        <a href="https://www.paypalobjects.com/marketing/ua/pdf/FR/fr/pay-in-4x-full.pdf" target="_blank" style="text-decoration:underline;">Voir conditions</a>
-                    </p>
-                </div>
-                <div class="recaptcha-legal" style="margin-top:20px; font-size:0.7rem; opacity:0.6;">
-                    Protected by reCAPTCHA. 
-                    <a href="https://policies.google.com/privacy" target="_blank">Privacy</a> - 
-                    <a href="https://policies.google.com/terms" target="_blank">Terms</a>
-                </div>
-                <p class="copyright" style="margin-top:30px; font-weight:600;">&copy; 2026 KICKS. Tous droits réservés.</p>
+            <div class="footer-col newsletter-col">
+                <h4>Newsletter</h4>
+                <p style="font-size:0.8rem; margin-bottom:10px; color:var(--text-secondary);">Inscris-toi pour des offres exclusives.</p>
+                <form id="newsletter-form" style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" name="prenom" placeholder="Prénom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                    <input type="text" name="nom" placeholder="Nom" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                    <input type="email" name="email" placeholder="Email" required style="padding:8px; border:1px solid var(--border-color); border-radius:4px;">
+                    <button type="submit" class="btn-primary" style="margin-top:5px; padding:10px; background: #ff6600; color: #fff; border: none; font-weight: bold; cursor: pointer;">S'INSCRIRE</button>
+                </form>
             </div>
         </div>
-    </footer>
+        
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:30px 0;">
+        
+        <div class="footer-payment-info" style="text-align:center;">
+            <div class="payment-icons">
+                <a href="#"><img src="assets/stripe.png" alt="Stripe"></a>
+                <a href="#"><img src="assets/visa.png" alt="Visa"></a>
+                <a href="#"><img src="assets/mastercard.png" alt="Mastercard"></a>
+                <a href="#"><img src="assets/paypal.png" alt="PayPal"></a>
+                <a href="#"><img src="assets/googlepay.png" alt="Google Pay"></a>
+                <a href="#"><img src="assets/applepay.png" alt="Apple Pay"></a>
+                <a href="#"><img src="assets/klarna.png" alt="Klarna"></a>
+            </div>
+            <p class="copyright" style="margin-top:30px; font-weight:600;">&copy; 2026 KICKS. Tous droits réservés.</p>
+        </div>
+    </div>
+</footer>
 
+<script>
+// Logique Accordéon
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.faq-question');
+    if (btn) {
+        const item = btn.parentElement;
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+        if (!isActive) item.classList.add('active');
+    }
+});
+
+// Filtrage Barre Unique
+document.getElementById('faq-search')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(term) ? 'block' : 'none';
+    });
+});
+</script>
     <a href="https://wa.me/+590690366198" target="_blank" class="whatsapp-float" aria-label="Contact WhatsApp">
         <img src="assets/whatsapp.png" alt="WhatsApp">
     </a>

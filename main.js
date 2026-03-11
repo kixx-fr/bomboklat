@@ -1,5 +1,5 @@
 /* =================================================================
-    ⚡ KICKS FRONTEND V32.8 - VERSION CORRIGÉE
+    ⚡ KICKS FRONTEND V32.8.3 - VERSION CORRIGÉE
 ================================================================= */
 
 /* --- 1. CONFIGURATION GLOBALE --- */
@@ -16,7 +16,11 @@ const CONFIG = {
     STRIPE_PUBLIC_KEY: "pk_live_51SX7GJBFCjC8b7qm7JgcMBsHMbUWb67Wb3rIIK1skppvjN29osXsr39G6i5LP40rjE5UZHNFmQEXS5tan4Uozqyp00dsJKtdrC",
     PRODUCTS_PER_PAGE: 10,
     MAX_QTY_PER_CART: 5,
-    FREE_SHIPPING_THRESHOLD: 150,
+    
+    // SEUILS DE LIVRAISON (Vérité pour la barre de progression)
+    FREE_SHIPPING_THRESHOLD: 400, // Seuil France
+    ANTILLES_THRESHOLD: 150,      // Seuil Antilles (Palier intermédiaire fun)
+    
     UPSELL_ID: "ACC-SOCK-PREM",
 
     FEES: {
@@ -56,7 +60,7 @@ if (typeof state === 'undefined') {
         recaptchaWidgetId: null,
         siteContent: {}          
     }; 
-} // <--- IL MANQUAIT CETTE ACCOLADE ICI POUR FERMER LE "IF"
+} // <--- Accolade fermée ici comme demandé
 
 
 function isMobileOrTablet() {
@@ -169,7 +173,7 @@ function getRecaptchaResponse() {
 ================================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("🚀 KICKS Frontend V32.8 Started");
+    console.log("🚀 KICKS Frontend V32.8.3 Started");
 
     // 1. Chargement Panier (Local et rapide)
     loadCart();
@@ -492,45 +496,6 @@ async function fetchGlobalContent() {
         console.log("✅ Contenu Global et textes légaux injectés.");
     } catch (e) { 
         console.warn("Erreur Contenu Global:", e); 
-    }
-}
-
-async function fetchAllCities() {
-    try {
-        // Chargement du fichier local au lieu de l'API
-        const res = await fetch('communes.json');
-        const data = await res.json();
-        
-        let cities = [];
-        if (Array.isArray(data)) cities = data;
-        
-        if (cities.length > 0) {
-            // On transforme les données du JSON pour coller au format attendu par le reste du site
-            state.allCities = cities.map(c => ({
-                // "Code_postal" devient "cp" pour le reste du script
-                cp: String(c.Code_postal || "").trim(), 
-                // "Commune" devient "ville"
-                ville: String(c.Commune || "").trim(),
-                villeNorm: normalizeString(String(c.Commune || ""))
-            }));
-            console.log("🏙️ Villes chargées via JSON :", state.allCities.length);
-        }
-    } catch (e) { 
-        console.warn("Erreur communes.json, repli sur API...", e);
-        // Sécurité : Si le fichier JSON est absent ou corrompu, on tente l'API
-        try {
-            const resApi = await fetch(`${CONFIG.API_URL}?action=getAllCities`);
-            const dataApi = await resApi.json();
-            if (Array.isArray(dataApi)) {
-                state.allCities = dataApi.map(c => ({
-                    cp: String(c.cp).trim(), 
-                    ville: String(c.ville).trim(),
-                    villeNorm: normalizeString(c.ville)
-                }));
-            }
-        } catch (errApi) {
-            console.error("Échec critique : Ni JSON ni API disponibles", errApi);
-        }
     }
 }
 
@@ -1345,13 +1310,22 @@ function initGDT(brandNameInput) {
     renderGdtBrand(currentBrand);
 }
 /* =================================================================
-   ⚡ KICKS FRONTEND V32.8 (PARTIE 2 : PANIER, CHECKOUT & COOKIES)
+    ⚡ KICKS FRONTEND V32.8.3 (PARTIE 2 : PANIER, CHECKOUT & COOKIES)
 ================================================================= */
 
 /* --- GESTION PANIER & UPSELL DYNAMIQUE --- */
 
 function loadCart() { 
     try { 
+        // Correctif : Nettoyage automatique du cache si la version change
+        const currentVersion = "32.8.3";
+        const savedVersion = localStorage.getItem('kicks_version');
+        
+        if (savedVersion !== currentVersion) {
+            localStorage.removeItem('kicks_cart');
+            localStorage.setItem('kicks_version', currentVersion);
+        }
+
         const saved = localStorage.getItem('kicks_cart');
         if (saved) state.cart = JSON.parse(saved); 
         updateCartUI(); 
@@ -1362,15 +1336,14 @@ function loadCart() {
 
 function saveCart() { 
     localStorage.setItem('kicks_cart', JSON.stringify(state.cart));
+    // Correctif : On enregistre la version avec le panier pour le suivi du cache
+    localStorage.setItem('kicks_version', "32.8.3");
 }
 
 function addToCart(product, size, qty) {
-    // 1. GESTION DU CHARGEMENT DES COMMUNES (À LA DEMANDE)
-    // On vérifie si les villes sont déjà chargées dans l'état global
-    if (!state.allCities || state.allCities.length === 0) {
-        console.log("📦 Premier ajout au panier détecté : Chargement du JSON des communes...");
-        fetchAllCities(); 
-    }
+    // 1. GESTION DU CHARGEMENT DES COMMUNES SUPPRIMÉE
+    // On retire l'appel à fetchAllCities() ici car le fichier de 5,7 Mo 
+    // bloque l'affichage du panier sur mobile et pose des problèmes de cache.
 
     // 2. TA LOGIQUE DE VÉRIFICATION DE LIMITE (EXISTANTE)
     const totalItems = state.cart.reduce((acc, item) => acc + item.qty, 0);
@@ -1393,17 +1366,17 @@ function addToCart(product, size, qty) {
     }
 
     // --- CONSTRUCTION DE L'URL ABSOLUE (IMAGE) ---
-let relativePath = product["Lien URL"] || 'assets/placeholder.jpg';
-let fullImageUrl = relativePath;
+    let relativePath = product["Lien URL"] || 'assets/placeholder.jpg';
+    let fullImageUrl = relativePath;
 
-// Si le chemin ne commence pas par http, on met le domaine officiel de ton site
-if (relativePath.indexOf('http') !== 0) {
-    // ON FORCE LE VRAI DOMAINE pour que les mails affichent les photos
-    const baseUrl = "https://kixx.fr"; 
-    
-    // Nettoyage des slashes
-    fullImageUrl = baseUrl + (relativePath.startsWith('/') ? '' : '/') + relativePath;
-}
+    // Si le chemin ne commence pas par http, on met le domaine officiel de ton site
+    if (relativePath.indexOf('http') !== 0) {
+        // ON FORCE LE VRAI DOMAINE pour que les mails affichent les photos
+        const baseUrl = "https://kixx.fr"; 
+        
+        // Nettoyage des slashes
+        fullImageUrl = baseUrl + (relativePath.startsWith('/') ? '' : '/') + relativePath;
+    }
 
     if (existing) {
         existing.qty += qty;
@@ -1453,6 +1426,8 @@ function updateCartUI() {
     list.innerHTML = ""; 
     let total = 0; 
     let count = 0;
+
+    // 1. Calcul du montant total du panier
     state.cart.forEach((item) => { 
         total += item.price * item.qty; 
         count += item.qty; 
@@ -1463,15 +1438,50 @@ function updateCartUI() {
         if(badge) badge.classList.add('hidden'); 
     } 
     else {
-        const remaining = CONFIG.FREE_SHIPPING_THRESHOLD - total;
-        let progressHtml = remaining > 0 ? 
-            `<div style="padding:10px; background:var(--bg-secondary); margin-bottom:15px; border-radius:4px; font-size:0.9rem; border:1px solid var(--border-color);">Plus que <b>${formatPrice(remaining)}</b> pour la livraison offerte !<div style="height:4px; background:#ddd; margin-top:5px; border-radius:2px;"><div style="width:${Math.min(100, ((CONFIG.FREE_SHIPPING_THRESHOLD - remaining) / CONFIG.FREE_SHIPPING_THRESHOLD) * 100)}%; height:100%; background:#00c853; border-radius:2px;"></div></div></div>` : 
-            `<div style="padding:10px; background:#e8f5e9; color:#2e7d32; margin-bottom:15px; border-radius:4px; font-weight:bold; text-align:center;">🎉 Livraison OFFERTE !</div>`;
+        // --- LOGIQUE DE BARRE DE PROGRESSION MALINE (ANTILLES & FRANCE) ---
+        const paysSelect = document.getElementById('ck-pays');
+        const currentZone = paysSelect ? paysSelect.value : 'France';
+        
+        const thresholdFrance = CONFIG.FREE_SHIPPING_THRESHOLD || 400;
+        const thresholdAntilles = CONFIG.ANTILLES_THRESHOLD || 150;
+        
+        let progressHtml = "";
+        let message = "";
+        let noteFun = "";
+        let percent = 0;
+
+        if (total < thresholdAntilles) {
+            // Étape 1 : On pousse vers les Antilles
+            percent = (total / thresholdAntilles) * 100;
+            message = `Plus que <b>${formatPrice(thresholdAntilles - total)}</b> pour la livraison offerte aux <b>Antilles</b> ! 🌴`;
+            noteFun = `<div style="font-size:0.75rem; color:#666; margin-top:5px;">Et encore un petit effort pour la France (${formatPrice(thresholdFrance)}) ! 🚀</div>`;
+        } 
+        else if (total >= thresholdAntilles && total < thresholdFrance) {
+            // Étape 2 : Antilles validées, on pousse vers la France
+            percent = (total / thresholdFrance) * 100;
+            message = `<b>✓ Offert pour les Antilles !</b> Plus que <b>${formatPrice(thresholdFrance - total)}</b> pour la <b>France</b> ! 🔥`;
+            noteFun = `<div style="font-size:0.75rem; color:#00c853; font-weight:bold; margin-top:5px;">On ne s'arrête pas en si bon chemin !</div>`;
+        } 
+        else {
+            // Étape 3 : Total atteint
+            percent = 100;
+            message = `🎉 Seuil de livraison offerte atteint !*`;
+            noteFun = `<div style="font-size:0.75rem; font-weight:normal; margin-top:5px; color:#444;">*La gratuité sera confirmée selon votre zone de livraison finale (France/Antilles).</div>`;
+        }
+
+        progressHtml = `
+            <div style="padding:15px; background:var(--bg-secondary); margin-bottom:15px; border-radius:4px; font-size:0.9rem; border:1px solid var(--border-color); text-align:center;">
+                <div style="margin-bottom:8px;">${message}</div>
+                <div style="height:10px; background:#ddd; border-radius:5px; overflow:hidden; border:1px solid rgba(0,0,0,0.05); position:relative;">
+                    <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #00c853, #b2ff59); transition: width 0.8s ease-out;"></div>
+                </div>
+                ${noteFun}
+            </div>`;
+        
         list.insertAdjacentHTML('beforeend', progressHtml);
 
+        // 2. Affichage des produits
         state.cart.forEach((item, idx) => { 
-            // --- CORRECTIFS POUR COMPATIBILITÉ BDD_PRODUITS ---
-            // On priorise 'item.image' (le lien réel de la Col F) et 'item.model' (le MasterName de la Col B)
             const itemImg = item.image || item.img || `assets/img/${item.model}.jpg`; 
             const itemName = item.model || item.name || "Produit KICKS";
 
@@ -1498,6 +1508,7 @@ function updateCartUI() {
         const targetUpsellId = triggerItem ? triggerItem.cartUpsellId : CONFIG.UPSELL_ID;
         const accessory = state.products.find(p => p.id === targetUpsellId);
         const isAccessoryInCart = state.cart.some(item => item.id === targetUpsellId);
+        
         if (accessory && !isAccessoryInCart && accessory.stock > 0) {
             const sizeRecommendation = triggerItem ? triggerItem.size : (accessory.sizesList[0] || 'TU');
             const phraseAccroche = triggerItem ? `Complétez votre commande de ${triggerItem.model} !` : "Ne manquez pas cet accessoire !";
@@ -1526,23 +1537,26 @@ function updateCartUI() {
             }, 0);
         }
 
-        if(badge) { badge.innerText = count; badge.classList.remove('hidden'); }
+        if(badge) { 
+            badge.innerText = count; 
+            badge.classList.remove('hidden'); 
+        }
 
-        // --- INCITATION PAYPAL AVEC RÉAJUSTEMENT LIVRAISON ---
-        const shippingCost = state.currentShippingRate ? (state.currentShippingRate.price || 0) : 0;
+        // --- INCITATION PAYPAL ---
+        const shippingCost = state.currentShippingRate ? (parseFloat(state.currentShippingRate.price || state.currentShippingRate.Cout || state.currentShippingRate.cout) || 0) : 0;
         const finalTotal = total + shippingCost;
         let paypalHtml = "";
         
         if (finalTotal > 0 && finalTotal < 30) {
             const missing = (30 - finalTotal).toFixed(2);
             paypalHtml = `
-                <div class="paypal-incentive" style="background:#fff9e6; border:1px dashed #ffcc00; padding:10px; border-radius:6px; margin-top:15px; font-size:0.85rem; color:#856404; text-align:center;">
+                <div class="paypal-incentive" style="background:#fff9e6; border:1px dashed #ffcc00; padding:10px; border-radius:66px; margin-top:15px; font-size:0.85rem; color:#856404; text-align:center;">
                     Ajoutez <strong>${missing}€</strong> pour profiter du <strong>Paiement en 4X</strong> sans frais avec PayPal.
                 </div>`;
         } else if (finalTotal >= 30) {
             const monthly = (finalTotal / 4).toFixed(2);
             paypalHtml = `
-                <div class="paypal-incentive" style="background:#e6f3ff; border:1px solid #0070ba; padding:10px; border-radius:6px; margin-top:15px; font-size:0.85rem; color:#003087; text-align:center; animation: paypalPulse 2s infinite;">
+                <div class="paypal-incentive" style="background:#e6f3ff; border:1px solid #0070ba; padding:10px; border-radius:6px; margin-top:15px; font-size:0.85rem; color:#003087; text-align:center;">
                     Éligible au <strong>Paiement en 4X</strong> PayPal : 4 mensualités de <strong>${monthly}€</strong>.
                 </div>`;
         }
@@ -1552,12 +1566,10 @@ function updateCartUI() {
     if(totalEl) totalEl.innerText = formatPrice(total); 
     if(qtyEl) qtyEl.innerText = count;
 
-    // --- RELANCE CALCUL LIVRAISON (ZONES SENSIBLES) ---
-    if (typeof calculateShipping === 'function' && document.getElementById('checkout-step-2')?.classList.contains('active')) {
-        calculateShipping();
+    if (typeof updateExpressShipping === 'function') {
+        updateExpressShipping();
     }
 }
-
 /* --- RECHERCHE --- */
 function initSearch() {
     const input = document.getElementById('search-input'); 
@@ -1801,8 +1813,7 @@ if (checkoutBtn) {
 function initCheckoutUI() {
     const btnVirement = document.getElementById('btn-pay-virement');
     if (btnVirement) {
-        // Suppression de l'ancienne fonction 'initiateBankTransferWrapper'
-        // On lie directement le bouton à ta fonction de traitement complète
+        // Liaison directe pour le traitement de la commande manuelle
         btnVirement.onclick = (e) => submitManualOrder(e);
     }
     
@@ -1812,12 +1823,18 @@ function initCheckoutUI() {
     
     const paysSelect = document.getElementById('ck-pays');
     if (paysSelect) {
-        paysSelect.addEventListener('change', () => updateShippingOptions(paysSelect.value));
+        paysSelect.addEventListener('change', () => {
+            // CORRECTIF : On rafraîchit la barre de progression ET les tarifs
+            // pour que le client voie tout de suite le bon palier (150€ ou 400€)
+            updateCartUI(); 
+            updateExpressShipping(); 
+        });
     }
 
     const villeInput = document.getElementById('ck-ville');
     const cpInput = document.getElementById('ck-cp');
 
+    // On déclenche la mise à jour dès que l'utilisateur tape une lettre ou un chiffre
     if (villeInput) villeInput.addEventListener('input', updateExpressShipping);
     if (cpInput) cpInput.addEventListener('input', updateExpressShipping);
 
@@ -1841,6 +1858,7 @@ function initCheckoutUI() {
         });
     }
 
+    // Initialisation par défaut au chargement
     initPaymentButtonsArea();
     updateCheckoutTotal();
     initAutocomplete();
@@ -1996,7 +2014,8 @@ function updateShippingOptions(selectedZone) {
     const villeInput = document.getElementById('ck-ville');
     const cpInput = document.getElementById('ck-cp');
     
-    if (!villeInput || !cpInput || villeInput.value.trim().length < 3) {
+    // Correctif : on autorise la détection dès 2 caractères (ex: début de CP 75 ou 97)
+    if (!villeInput || !cpInput || cpInput.value.trim().length < 2) {
         container.innerHTML = '<div style="color:#666; font-style:italic; padding:10px;">Veuillez compléter votre adresse (CP et Ville) pour voir les tarifs.</div>';
         state.currentShippingRate = null;
         updateCheckoutTotal();
@@ -2005,31 +2024,44 @@ function updateShippingOptions(selectedZone) {
 
     const cartSubtotal = state.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const userCityRaw = villeInput.value;
-    const userCityNorm = normalizeString(userCityRaw);
+    const userCityNorm = typeof normalizeString === 'function' ? normalizeString(userCityRaw) : userCityRaw.toLowerCase();
 
+    // FILTRAGE STRICT VIA LA SHEET (Colonnes A, C, D, E, G)
     let validRates = state.shippingRates.filter(rate => {
-        if (rate.code !== selectedZone) return false;
-        if (String(rate.name).toLowerCase().includes('express') || rate.isSensitive) return false;
+        // Colonne A: On vérifie la zone
+        const rateZone = rate.Zone_Cle || rate.zone_cle || rate.code;
+        if (rateZone !== selectedZone) return false;
 
-        const min = parseFloat(rate.min || 0);
-        const max = parseFloat(rate.max || 999999);
-        const isFreeShippingRate = parseFloat(rate.price) === 0;
-        
-        if (cartSubtotal >= CONFIG.FREE_SHIPPING_THRESHOLD && isFreeShippingRate) return true;
-        if (!isFreeShippingRate) return cartSubtotal >= min && cartSubtotal <= max;
-        return false;
+        // Colonne G & Nom: On ignore l'Express pour le traitement spécial après
+        const isExpress = String(rate.name || "").toLowerCase().includes('express') || (rate.Is_Zone_Sensitive || rate.is_zone_sensitive || rate.isSensitive);
+        if (isExpress) return false;
+
+        // Colonne D & E: On vérifie les paliers Min et Max
+        const min = parseFloat(rate.Min_Total || rate.min_total || rate.min || 0);
+        const max = parseFloat(rate.Montant_Max || rate.montant_max || rate.max || 999999);
+
+        // On vérifie si le panier est dans la tranche définie par la Sheet
+        return cartSubtotal >= min && cartSubtotal <= max;
     });
 
-    if (selectedZone === 'Guadeloupe' || selectedZone === 'Martinique' || selectedZone === 'Guyane') {
-        const isEligible = state.expressZones.some(zoneKeyword => userCityNorm.includes(zoneKeyword));
-        if (isEligible) {
-            const expressRate = state.shippingRates.find(r => 
-                r.code === selectedZone && 
-                (String(r.name).toLowerCase().includes('express') || r.isSensitive)
-            );
+    // GESTION DES ZONES SENSIBLES (EXPRESS 24H)
+    const zonesAntilles = ['Guadeloupe', 'Martinique', 'Guyane'];
+    if (zonesAntilles.includes(selectedZone)) {
+        const isEligibleExpress = state.expressZones && state.expressZones.some(zoneKeyword => {
+            const normKey = typeof normalizeString === 'function' ? normalizeString(zoneKeyword) : zoneKeyword.toLowerCase();
+            return userCityNorm.includes(normKey);
+        });
+        
+        if (isEligibleExpress) {
+            const expressRate = state.shippingRates.find(r => {
+                const rZone = r.Zone_Cle || r.zone_cle || r.code;
+                const rIsSensitive = (r.Is_Zone_Sensitive || r.is_zone_sensitive || r.isSensitive || String(r.name || "").toLowerCase().includes('express'));
+                return rZone === selectedZone && rIsSensitive;
+            });
+
             if (expressRate) {
-                const min = parseFloat(expressRate.min || 0);
-                const max = parseFloat(expressRate.max || 999999);
+                const min = parseFloat(expressRate.Min_Total || expressRate.min_total || expressRate.min || 0);
+                const max = parseFloat(expressRate.Montant_Max || expressRate.montant_max || expressRate.max || 999999);
                 if (cartSubtotal >= min && cartSubtotal <= max) {
                     validRates.push(expressRate);
                 }
@@ -2041,25 +2073,34 @@ function updateShippingOptions(selectedZone) {
         container.innerHTML = '<div style="color:red; padding:10px;">Aucune livraison disponible pour cette zone/montant.</div>';
         state.currentShippingRate = null;
     } else {
-        validRates.sort((a, b) => (parseFloat(a.price)||0) - (parseFloat(b.price)||0));
+        // Tri par prix croissant pour mettre l'OFFERT en premier
+        validRates.sort((a, b) => {
+            const priceA = parseFloat(a.Cout || a.cout || a.price || 0);
+            const priceB = parseFloat(b.Cout || b.cout || b.price || 0);
+            return priceA - priceB;
+        });
+
         validRates.forEach((rate, idx) => {
             const label = document.createElement('label');
             const logoHtml = rate.logo ? `<img src="${rate.logo}" style="height:25px; margin-right:10px; object-fit:contain;">` : '';
-            const price = parseFloat(rate.price || 0);
+            
+            const price = parseFloat(rate.Cout || rate.cout || rate.price || 0);
             const priceTxt = price === 0 ? "OFFERT" : formatPrice(price);
             const color = price === 0 ? "#00c853" : "#000";
             
-            const isExpress = String(rate.name).toLowerCase().includes('express') || rate.isSensitive;
+            const isExpress = String(rate.name || "").toLowerCase().includes('express') || (rate.Is_Zone_Sensitive || rate.is_zone_sensitive || rate.isSensitive);
             const bgStyle = isExpress ? "background:#fff8e1; border:1px solid #ffc107;" : "";
             
-            const isSelected = (!state.currentShippingRate && idx === 0) || (state.currentShippingRate && state.currentShippingRate.name === rate.name && state.currentShippingRate.code === rate.code);
+            // Sélection par défaut du premier ou maintien du choix actuel
+            const isSelected = (!state.currentShippingRate && idx === 0) || 
+                             (state.currentShippingRate && state.currentShippingRate.name === rate.name && (state.currentShippingRate.Zone_Cle || state.currentShippingRate.zone_cle || state.currentShippingRate.code) === (rate.Zone_Cle || rate.zone_cle || rate.code));
 
             label.innerHTML = `
-                <div class="shipping-option" style="display:flex; align-items:center; width:100%; cursor:pointer; padding:10px; border-radius:6px; ${bgStyle}">
+                <div class="shipping-option" style="display:flex; align-items:center; width:100%; cursor:pointer; padding:10px; border-radius:6px; margin-bottom:5px; border:1px solid var(--border-color); ${bgStyle}">
                     <input type="radio" name="shipping_method" value="${idx}" ${isSelected?'checked':''} style="margin-right:15px;">
                     ${logoHtml}
                     <div style="flex:1;">
-                        <span style="font-weight:700;">${rate.name}</span>
+                        <span style="font-weight:700;">${rate.name || "Transporteur"}</span>
                         ${isExpress ? '<br><small style="color:#d32f2f; font-weight:bold;">🚀 Livraison Rapide 24h</small>' : ''}
                     </div>
                     <b style="color:${color}">${priceTxt}</b>
@@ -2072,7 +2113,7 @@ function updateShippingOptions(selectedZone) {
             });
             container.appendChild(label);
             
-            if(isSelected || (!state.currentShippingRate && idx === 0)) state.currentShippingRate = rate;
+            if(isSelected) state.currentShippingRate = rate;
         });
     }
     updateCheckoutTotal();
@@ -2080,8 +2121,8 @@ function updateShippingOptions(selectedZone) {
 
 function updateCheckoutTotal() {
     const subTotal = state.cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    const shipping = state.currentShippingRate ? parseFloat(state.currentShippingRate.price) : 0;
-    const discount = state.appliedPromoCode ? state.promoDiscountAmount : 0;
+    const shipping = state.currentShippingRate ? parseFloat(state.currentShippingRate.Cout || state.currentShippingRate.cout || state.currentShippingRate.price || 0) : 0;
+    const discount = state.appliedPromoCode ? (state.promoDiscountAmount || 0) : 0;
     const baseTotal = Math.max(0, subTotal + shipping - discount);
     
     const feeConfig = CONFIG.FEES[state.currentPaymentMethod] || CONFIG.FEES.CARD;
@@ -2096,7 +2137,7 @@ function updateCheckoutTotal() {
     const setText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
     
     setText('checkout-subtotal', formatPrice(subTotal));
-    setText('checkout-shipping', state.currentShippingRate ? (shipping===0?"Offert":formatPrice(shipping)) : "...");
+    setText('checkout-shipping', state.currentShippingRate ? (shipping === 0 ? "Offert" : formatPrice(shipping)) : "...");
     
     const discRow = document.getElementById('discount-row');
     if (discRow) {
@@ -2126,9 +2167,6 @@ function updateCheckoutTotal() {
         if (state.currentPaymentMethod === 'KLARNA') payLabel.innerText = `🌸 Payer ${formatPrice(grandTotal)}`;
         else if (state.currentPaymentMethod === 'CARD') payLabel.innerText = `💳 Payer par Carte`;
     }
-
-    // --- ICI TU METS LES // POUR STOPPER LE DOUBLON ---
-    // syncAbandonedCart(); 
 }
 
 /* --- PAIEMENTS & HELPERS --- */
@@ -2762,12 +2800,15 @@ async function submitManualOrder(event) {
             throw new Error("Veuillez valider le reCAPTCHA.");
         }
 
-        // 5. CALCUL DU PRIX
+        // 5. CALCUL DU PRIX (CORRIGÉ & BLINDÉ)
         const cart = state.cart || [];
         if (cart.length === 0) throw new Error("Votre panier est vide.");
 
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-        const shipping = state.currentShippingRate ? parseFloat(state.currentShippingRate.price) : 0;
+        
+        // Correctif : Extraction sécurisée du prix de livraison selon les différentes clés possibles
+        const shipping = state.currentShippingRate ? parseFloat(state.currentShippingRate.Cout || state.currentShippingRate.cout || state.currentShippingRate.price || 0) : 0;
+        
         const discount = state.promoDiscountAmount || 0;
         const numericTotal = parseFloat((subtotal + shipping - discount).toFixed(2));
 

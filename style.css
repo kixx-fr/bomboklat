@@ -105,12 +105,39 @@ body.dark-mode .logo-dark { display: block; }
 }
 .search-input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); min-width: 0; }
 
-/* Correction DARK MODE pour les icônes */
-body.dark-mode .header-actions i,
-body.dark-mode .header-actions svg,
-body.dark-mode #mobile-menu-trigger {
+/* --- CORRECTIF FINAL VISIBILITÉ BURGER & MENU DARK MODE --- */
+
+/* 1. Force l'icône du burger à devenir blanche en Dark Mode */
+body.dark-mode .menu-toggle i, 
+body.dark-mode .burger-menu i,
+body.dark-mode i.fa-bars {
     color: #ffffff !important;
-    fill: #ffffff !important;
+}
+
+/* 2. Force le fond du menu mobile à devenir sombre */
+body.dark-mode #mobile-filter-drawer {
+    background-color: #121212 !important;
+    border-right: 1px solid #333 !important;
+}
+
+/* 3. Force tous les textes et liens à l'intérieur du menu à devenir blancs */
+body.dark-mode #mobile-filter-drawer .drawer-header,
+body.dark-mode #mobile-filter-drawer .drawer-body,
+body.dark-mode #mobile-filter-drawer a,
+body.dark-mode #mobile-filter-drawer span,
+body.dark-mode #mobile-filter-drawer i,
+body.dark-mode #mobile-filter-drawer .filter-label {
+    color: #ffffff !important;
+}
+
+/* 4. On s'assure que le bouton de fermeture (X) est aussi visible */
+body.dark-mode #mobile-filter-drawer .close-drawer i {
+    color: #ffffff !important;
+}
+
+/* 5. Ajustement des fonds de catégories si nécessaire */
+body.dark-mode #mobile-filter-drawer .category-item:hover {
+    background-color: #333333 !important;
 }
 
 .search-dropdown, #search-results {

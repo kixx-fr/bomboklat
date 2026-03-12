@@ -1086,13 +1086,15 @@ body.dark-mode #modal-gdt .table td {
     border: 1px solid #f0f0f0 !important;
 }
 
-/* 4. FIX ICÔNES & PAYPAL */
+/* --- CORRECTIF VISIBILITÉ BURGER DARK MODE --- */
 body.dark-mode .header-actions i, 
 body.dark-mode .header-actions svg,
 body.dark-mode #theme-toggle i,
 body.dark-mode .cart-icon-wrapper i,
-body.dark-mode .cart-icon-wrapper svg {
+body.dark-mode .cart-icon-wrapper svg,
+body.dark-mode #mobile-menu-trigger svg { /* Ajout de l'ID du burger ici */
     color: #ffffff !important;
+    stroke: #ffffff !important; /* Force la couleur du trait du SVG */
     fill: #ffffff !important;
 }
 

@@ -1626,7 +1626,6 @@ function updateThemeIcons(isDark) {
         moon.style.color = isDark ? "#ffffff" : "inherit"; 
     } 
 }
-
 /* --- LOGIQUE MOBILE & OFF-CANVAS --- */
 function setupMobileFilters() {
     const isMobile = isMobileOrTablet();
@@ -1634,7 +1633,8 @@ function setupMobileFilters() {
     const mobileContent = document.getElementById('mobile-filters-content');
     const mobileTrigger = document.getElementById('mobile-menu-trigger');
     const filterDrawer = document.getElementById('mobile-filter-drawer');
-    const applyBtn = document.getElementById('apply-filters-btn');
+    // CORRECTIF : On cible le bouton spécifique au tiroir mobile pour la fermeture
+    const applyBtn = document.getElementById('apply-filters-mobile-btn') || document.getElementById('apply-filters-btn');
     const searchContainer = document.querySelector('.search-container');
     const headerContainer = document.querySelector('.header-container'); 
 
@@ -1663,16 +1663,21 @@ function setupMobileFilters() {
 
         if (mobileTrigger) {
             mobileTrigger.classList.remove('hidden');
-            mobileTrigger.addEventListener('click', () => {
+            // On s'assure de ne pas multiplier les écouteurs
+            mobileTrigger.onclick = () => {
                 openPanel(filterDrawer);
-            });
+            };
         }
         
         if (applyBtn) {
-            applyBtn.addEventListener('click', () => {
+            applyBtn.onclick = () => {
+                // 1. Applique les filtres
+                renderCatalog(true);
+                // 2. Ferme le tiroir (Correctif : utilise closePanel)
                 closePanel(filterDrawer);
-                renderCatalog(true); 
-            });
+                // 3. Remonte la page en haut pour voir les résultats
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
         }
 
     } else { 

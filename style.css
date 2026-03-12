@@ -267,9 +267,11 @@ body.dark-mode .close-modal, body.dark-mode .close-drawer { color: #ffffff; back
 
 /* --- 7. DRAWER PANIER & FILTRES MOBILES --- */
 .drawer-content {
-    position: absolute; top: 0; right: -100%; width: 100%; max-width: 450px; height: 100%;
+    position: absolute; top: 0; right: -100%; width: 100%; max-width: 450px; 
+    height: 100dvh; /* CORRECTIF : Utilisation du Dynamic Viewport Height pour verrouiller la hauteur sur mobile */
     background-color: var(--bg-card); transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex; flex-direction: column; z-index: 2001;
+    overflow: hidden; /* CORRECTIF : Empêche le conteneur global de défiler, seul le body devra défiler */
 }
 .drawer.open .drawer-content { right: 0; }
 .drawer-header, .drawer-footer { 
@@ -625,7 +627,32 @@ body.dark-mode .thumbnails-row img { background: #333; border-color: #444; }
 /* --- 15. OPTIMISATIONS TRES PETITS ÉCRANS (Max 480px) --- */
 @media (max-width: 480px) {
     .header-container { padding: 0 10px; }
-    .drawer-content { max-width: 100%; }
+    
+    /* CORRECTIF : On s'assure que le panier occupe tout l'écran proprement */
+    .drawer-content { 
+        max-width: 100%; 
+        height: 100dvh !important; 
+        display: flex; 
+        flex-direction: column;
+    }
+    
+    /* CORRECTIF : On réduit les paddings internes pour libérer de l'espace pour le bouton */
+    .drawer-body { 
+        padding: 15px 10px !important; 
+        flex: 1; 
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch; 
+    }
+
+    /* CORRECTIF : On s'assure que le footer (bouton) est toujours visible en bas */
+    .drawer-footer {
+        padding: 10px !important;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-color);
+        position: sticky;
+        bottom: 0;
+    }
+
     #mobile-filter-drawer .drawer-content { max-width: 90%; }
     .main-image-container { height: 200px; }
     .thumbnails-row img { width: 50px; height: 50px; }

@@ -1502,39 +1502,50 @@ function updateCartUI() {
             list.appendChild(div); 
         });
 
-        // --- GESTION UPSELL ---
-        const triggerItem = state.cart.find(item => item.cartUpsellId && item.cartUpsellId.length > 1);
-        const targetUpsellId = triggerItem ? triggerItem.cartUpsellId : CONFIG.UPSELL_ID;
-        const accessory = state.products.find(p => p.id === targetUpsellId);
-        const isAccessoryInCart = state.cart.some(item => item.id === targetUpsellId);
-        
-        if (accessory && !isAccessoryInCart && accessory.stock > 0) {
-            const sizeRecommendation = triggerItem ? triggerItem.size : (accessory.sizesList[0] || 'TU');
-            const phraseAccroche = triggerItem ? `Complétez votre commande !` : "Ne manquez pas cet accessoire !";
-            
-            // CORRECTIF : Utilisation de classes CSS ou réduction des styles inline pour la hauteur
-            const upsellHtml = `
-                <div class="cart-upsell-container" style="background:#fff8e1; border:1px solid #ffc107; padding:10px; border-radius:6px; margin-top:10px; display:flex; gap:10px; align-items:center;">
-                    <img src="${accessory.images[0] || 'assets/placeholder.jpg'}" style="width:45px; height:45px; object-fit:cover; border-radius:4px;">
-                    <div style="flex:1;">
-                        <p style="margin:0; font-weight:bold; font-size:0.8rem; color:#111;">${phraseAccroche}</p>
-                        <p style="margin:2px 0 6px; font-size:0.7rem;">Ajouter <strong>${accessory.model}</strong> (${sizeRecommendation})</p>
-                        <button id="add-upsell-btn" data-id="${accessory.id}" data-size="${sizeRecommendation}" style="background:#ffc107; color:#111; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:0.7rem; cursor:pointer;">Ajouter (+${formatPrice(accessory.price)})</button>
-                    </div>
-                </div>
-            `;
+        // --- GESTION UPSELL AUTOMATISÉE (2 PRODUITS ALÉATOIRES) ---
+        // 1. On filtre les produits qui ne sont pas déjà dans le panier et qui ont du stock
+        const cartIds = state.cart.map(item => item.id);
+        const candidates = state.products.filter(p => !cartIds.includes(p.id) && p.stock > 0);
+
+        if (candidates.length > 0) {
+            // 2. On mélange et on prend 2 produits au hasard
+            const shuffled = candidates.sort(() => 0.5 - Math.random());
+            const upsellProducts = shuffled.slice(0, 2);
+
+            let upsellHtml = `
+                <div class="upsell-section" style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
+                    <p style="margin:0 0 10px; font-weight:800; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;">Vous pourriez aussi aimer</p>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+
+            upsellProducts.forEach(prod => {
+                const prodImg = (prod.images && prod.images[0]) || 'assets/img/placeholder.jpg';
+                // On prend la première taille dispo ou 'TU'
+                const defSize = (prod.sizesList && prod.sizesList.length > 0) ? prod.sizesList[0] : 'TU';
+                
+                upsellHtml += `
+                    <div class="upsell-card" style="background:var(--bg-secondary); padding:8px; border-radius:6px; border:1px solid var(--border-color); text-align:center;">
+                        <img src="${prodImg}" style="width:100%; height:80px; object-fit:contain; margin-bottom:5px;">
+                        <div style="font-size:0.75rem; font-weight:700; height:32px; overflow:hidden; line-height:1.1; margin-bottom:4px;">${prod.model}</div>
+                        <div style="font-size:0.8rem; font-weight:800; color:var(--accent-color); margin-bottom:8px;">${formatPrice(prod.price)}</div>
+                        <button class="quick-add-upsell" data-id="${prod.id}" data-size="${defSize}" style="width:100%; background:#000; color:#fff; border:none; padding:6px; border-radius:4px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
+                            AJOUTER
+                        </button>
+                    </div>`;
+            });
+
+            upsellHtml += `</div></div>`;
             list.insertAdjacentHTML('beforeend', upsellHtml);
-            
+
+            // 3. Écouteurs pour les nouveaux boutons
             setTimeout(() => {
-                const upsellBtn = document.getElementById('add-upsell-btn');
-                if (upsellBtn) {
-                    upsellBtn.addEventListener('click', () => {
-                        const recSize = upsellBtn.getAttribute('data-size');
-                        const recId = upsellBtn.getAttribute('data-id');
-                        const productToAdd = state.products.find(p => p.id === recId);
-                        if(productToAdd) addToCart(productToAdd, recSize, 1);
-                    });
-                }
+                document.querySelectorAll('.quick-add-upsell').forEach(btn => {
+                    btn.onclick = () => {
+                        const id = btn.getAttribute('data-id');
+                        const size = btn.getAttribute('data-size');
+                        const p = state.products.find(x => x.id === id);
+                        if(p) addToCart(p, size, 1);
+                    };
+                });
             }, 0);
         }
 
@@ -1563,6 +1574,7 @@ function updateCartUI() {
                     Éligible au <strong>Paiement en 4X</strong> PayPal : 4 mensualités de <strong>${monthly}€</strong>.
                 </div>`;
         }
+        // Le placement 'beforeend' garantit qu'il s'affiche tout en bas du contenu de la liste
         list.insertAdjacentHTML('beforeend', paypalHtml);
     }
     

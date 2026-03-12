@@ -1510,16 +1510,16 @@ function updateCartUI() {
         
         if (accessory && !isAccessoryInCart && accessory.stock > 0) {
             const sizeRecommendation = triggerItem ? triggerItem.size : (accessory.sizesList[0] || 'TU');
-            const phraseAccroche = triggerItem ? `Complétez votre commande de ${triggerItem.model} !` : "Ne manquez pas cet accessoire !";
+            const phraseAccroche = triggerItem ? `Complétez votre commande !` : "Ne manquez pas cet accessoire !";
             
-            // CORRECTIF : Réduction des paddings et de la taille de l'image pour gagner de la place verticale
+            // CORRECTIF : Utilisation de classes CSS ou réduction des styles inline pour la hauteur
             const upsellHtml = `
                 <div class="cart-upsell-container" style="background:#fff8e1; border:1px solid #ffc107; padding:10px; border-radius:6px; margin-top:10px; display:flex; gap:10px; align-items:center;">
-                    <img src="${accessory.images[0] || 'assets/placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                    <img src="${accessory.images[0] || 'assets/placeholder.jpg'}" style="width:45px; height:45px; object-fit:cover; border-radius:4px;">
                     <div style="flex:1;">
-                        <p style="margin:0; font-weight:bold; font-size:0.85rem; color:#111;">${phraseAccroche}</p>
-                        <p style="margin:2px 0 6px; font-size:0.75rem;">Ajouter <strong>${accessory.model}</strong> (${sizeRecommendation}) pour ${formatPrice(accessory.price)}</p>
-                        <button id="add-upsell-btn" data-id="${accessory.id}" data-size="${sizeRecommendation}" style="background:#ffc107; color:#111; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:0.7rem; cursor:pointer;">Ajouter au Panier</button>
+                        <p style="margin:0; font-weight:bold; font-size:0.8rem; color:#111;">${phraseAccroche}</p>
+                        <p style="margin:2px 0 6px; font-size:0.7rem;">Ajouter <strong>${accessory.model}</strong> (${sizeRecommendation})</p>
+                        <button id="add-upsell-btn" data-id="${accessory.id}" data-size="${sizeRecommendation}" style="background:#ffc107; color:#111; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:0.7rem; cursor:pointer;">Ajouter (+${formatPrice(accessory.price)})</button>
                     </div>
                 </div>
             `;
@@ -1550,14 +1550,14 @@ function updateCartUI() {
         
         if (finalTotal > 0 && finalTotal < 30) {
             const missing = (30 - finalTotal).toFixed(2);
-            // CORRECTIF : Marges réduites (margin-top: 10px au lieu de 15px) et padding optimisé
+            // CORRECTIF : Marges et padding réduits pour mobile
             paypalHtml = `
                 <div class="paypal-incentive" style="background:#fff9e6; border:1px dashed #ffcc00; padding:8px 10px; border-radius:6px; margin-top:10px; font-size:0.8rem; color:#856404; text-align:center;">
                     Ajoutez <strong>${missing}€</strong> pour profiter du <strong>Paiement en 4X</strong> sans frais avec PayPal.
                 </div>`;
         } else if (finalTotal >= 30) {
             const monthly = (finalTotal / 4).toFixed(2);
-            // CORRECTIF : Réduction de la taille de police et des marges pour libérer de l'espace vertical
+            // CORRECTIF : Taille de police réduite pour éviter l'expulsion du bouton footer
             paypalHtml = `
                 <div class="paypal-incentive" style="background:#e6f3ff; border:1px solid #0070ba; padding:8px 10px; border-radius:6px; margin-top:10px; font-size:0.8rem; color:#003087; text-align:center;">
                     Éligible au <strong>Paiement en 4X</strong> PayPal : 4 mensualités de <strong>${monthly}€</strong>.

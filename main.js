@@ -1476,9 +1476,6 @@ function updateCartUI() {
                 ${noteFun}
             </div>`;
         
-        // On injecte UNE SEULE FOIS au début de la liste
-        list.insertAdjacentHTML('afterbegin', progressHtml);
-
         // 2. Affichage des produits
         state.cart.forEach((item, idx) => { 
             const itemImg = item.image || item.img || `assets/img/${item.model}.jpg`; 
@@ -1502,42 +1499,58 @@ function updateCartUI() {
             list.appendChild(div); 
         });
 
-        // --- GESTION UPSELL AUTOMATISÉE (2 PRODUITS ALÉATOIRES) ---
+        // --- GESTION UPSELL AUTOMATISÉE (3 PRODUITS : PRIORITÉ ACCESSOIRE + 2 SNEAKERS) ---
         const cartIds = state.cart.map(item => item.id);
         const candidates = state.products.filter(p => !cartIds.includes(p.id) && p.stock > 0);
 
         if (candidates.length > 0) {
-            const shuffled = candidates.sort(() => 0.5 - Math.random());
-            const upsellProducts = shuffled.slice(0, 2);
+            let upsellProducts = [];
+
+            // 1. On cherche d'abord 1 accessoire (Priorité PROTECTION SPORT)
+            const accessory = candidates.find(p => {
+                const cat = (p.category || p.Categorie || "").toUpperCase();
+                return cat.includes("PROTECTION SPORT") || cat.includes("ATTELLE") || cat.includes("GENOUILLERE");
+            });
+
+            if (accessory) {
+                upsellProducts.push(accessory);
+            }
+
+            // 2. On complète avec des sneakers pour arriver à 3 produits
+            const remainingCandidates = candidates.filter(p => !upsellProducts.includes(p));
+            const shuffledShoes = remainingCandidates.sort(() => 0.5 - Math.random());
+            
+            // On prend ce qu'il faut pour atteindre 3 au total
+            upsellProducts = upsellProducts.concat(shuffledShoes.slice(0, 3 - upsellProducts.length));
 
             let upsellHtml = `
                 <div class="upsell-section" style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
                     <p style="margin:0 0 10px; font-weight:800; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;">Vous pourriez aussi aimer</p>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">`;
 
             upsellProducts.forEach(prod => {
                 const prodImg = (prod.images && prod.images[0]) || 'assets/img/placeholder.jpg';
                 const defSize = (prod.sizesList && prod.sizesList.length > 0) ? prod.sizesList[0] : 'TU';
                 
                 upsellHtml += `
-                    <div class="upsell-card" style="background:var(--bg-secondary); padding:8px; border-radius:6px; border:1px solid var(--border-color); text-align:center;">
+                    <div class="upsell-card" style="background:var(--bg-secondary); padding:6px; border-radius:6px; border:1px solid var(--border-color); text-align:center; display:flex; flex-direction:column; justify-content:space-between;">
                         <div class="upsell-clickable" data-id="${prod.id}" style="cursor:pointer;">
-                            <img src="${prodImg}" style="width:100%; height:80px; object-fit:contain; margin-bottom:5px;">
-                            <div style="font-size:0.75rem; font-weight:700; height:32px; overflow:hidden; line-height:1.1; margin-bottom:4px;">${prod.model}</div>
+                            <img src="${prodImg}" style="width:100%; height:60px; object-fit:contain; margin-bottom:5px;">
+                            <div style="font-size:0.65rem; font-weight:700; height:28px; overflow:hidden; line-height:1.1; margin-bottom:4px;">${prod.model}</div>
                         </div>
-                        <div style="font-size:0.8rem; font-weight:800; color:var(--accent-color); margin-bottom:8px;">${formatPrice(prod.price)}</div>
-                        <button class="quick-add-upsell" data-id="${prod.id}" data-size="${defSize}" style="width:100%; background:#000; color:#fff; border:none; padding:6px; border-radius:4px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
-                            AJOUTER
-                        </button>
+                        <div>
+                            <div style="font-size:0.75rem; font-weight:800; color:var(--accent-color); margin-bottom:6px;">${formatPrice(prod.price)}</div>
+                            <button class="quick-add-upsell" data-id="${prod.id}" data-size="${defSize}" style="width:100%; background:#000; color:#fff; border:none; padding:5px; border-radius:4px; font-size:0.6rem; font-weight:bold; cursor:pointer;">
+                                AJOUTER
+                            </button>
+                        </div>
                     </div>`;
             });
 
             upsellHtml += `</div></div>`;
             list.insertAdjacentHTML('beforeend', upsellHtml);
 
-            // Écouteurs d'événements
             setTimeout(() => {
-                // Gestion du clic sur l'image/titre pour ouvrir la modale
                 document.querySelectorAll('.upsell-clickable').forEach(area => {
                     area.onclick = () => {
                         const id = area.getAttribute('data-id');
@@ -1546,7 +1559,6 @@ function updateCartUI() {
                     };
                 });
 
-                // Gestion du bouton AJOUTER
                 document.querySelectorAll('.quick-add-upsell').forEach(btn => {
                     btn.onclick = (e) => {
                         e.stopPropagation(); 

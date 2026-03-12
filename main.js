@@ -1179,10 +1179,10 @@ function renderRelatedProducts(relatedIds) {
 
 /* --- NOUVEAU GDT (Logic GDT conservée à l'identique) --- */
 
-const GDT_BRANDS = ['Nike','Jordan','Peak','361°','Puma','Under Armour','Adidas','Reebok','Timberland','Converse','Asics'];
-const GDT_RANGES = { men:{min:35,max:50}, women:{min:34,max:45}, kids:{min:28,max:39} };
-const GDT_ADJUST = {'Nike':0,'Jordan':0.2,'Peak':0,'361°':-0.1,'Puma':0.1,'Under Armour':0,'Adidas':0,'Reebok':0,'Timberland':0.3,'Converse':-0.2,'Asics':0};
-const GDT_HEADERS = {
+var GDT_BRANDS = ['Nike','Jordan','Peak','361°','Puma','Under Armour','Adidas','Reebok','Timberland','Converse','Asics'];
+var GDT_RANGES = { men:{min:35,max:50}, women:{min:34,max:45}, kids:{min:28,max:39} };
+var GDT_ADJUST = {'Nike':0,'Jordan':0.2,'Peak':0,'361°':-0.1,'Puma':0.1,'Under Armour':0,'Adidas':0,'Reebok':0,'Timberland':0.3,'Converse':-0.2,'Asics':0};
+var GDT_HEADERS = {
     'men': ['EU','US (M)','UK','Longueur pied'],
     'women': ['EU','US (W)','UK','Longueur pied'],
     'kids': ['EU','US (Y/C)','UK','Longueur pied']
@@ -1451,23 +1451,33 @@ function updateCartUI() {
         let percent = 0;
 
         if (total < thresholdAntilles) {
-            // Étape 1 : On pousse vers les Antilles
             percent = (total / thresholdAntilles) * 100;
             message = `Plus que <b>${formatPrice(thresholdAntilles - total)}</b> pour la livraison offerte aux <b>Antilles</b> ! 🌴`;
-            noteFun = `<div style="font-size:0.75rem; color:#666; margin-top:5px;">Et encore un petit effort pour la France (${formatPrice(thresholdFrance)}) ! 🚀</div>`;
+            noteFun = `<div style="font-size:0.7rem; color:#666; margin-top:4px;">Et encore un effort pour la France (${formatPrice(thresholdFrance)}) ! 🚀</div>`;
         } 
         else if (total >= thresholdAntilles && total < thresholdFrance) {
-            // Étape 2 : Antilles validées, on pousse vers la France
             percent = (total / thresholdFrance) * 100;
             message = `<b>✓ Offert pour les Antilles !</b> Plus que <b>${formatPrice(thresholdFrance - total)}</b> pour la <b>France</b> ! 🔥`;
-            noteFun = `<div style="font-size:0.75rem; color:#00c853; font-weight:bold; margin-top:5px;">On ne s'arrête pas en si bon chemin !</div>`;
+            noteFun = `<div style="font-size:0.7rem; color:#00c853; font-weight:bold; margin-top:4px;">On ne s'arrête pas en si bon chemin !</div>`;
         } 
         else {
-            // Étape 3 : Total atteint
             percent = 100;
             message = `🎉 Seuil de livraison offerte atteint !*`;
-            noteFun = `<div style="font-size:0.75rem; font-weight:normal; margin-top:5px; color:#444;">*La gratuité sera confirmée selon votre zone de livraison finale (France/Antilles).</div>`;
+            noteFun = `<div style="font-size:0.7rem; font-weight:normal; margin-top:4px; color:#444;">*Confirmé selon votre zone finale.</div>`;
         }
+
+        // CORRECTIF : Réduction des paddings et marges pour mobile
+        progressHtml = `
+            <div class="cart-progress-container" style="padding:10px; background:var(--bg-secondary); margin-bottom:10px; border-radius:4px; font-size:0.85rem; border:1px solid var(--border-color); text-align:center;">
+                <div style="margin-bottom:6px;">${message}</div>
+                <div style="height:8px; background:#ddd; border-radius:5px; overflow:hidden; border:1px solid rgba(0,0,0,0.05); position:relative;">
+                    <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #00c853, #b2ff59); transition: width 0.8s ease-out;"></div>
+                </div>
+                ${noteFun}
+            </div>`;
+        
+        // On l'insère au début de la liste pour qu'elle soit vue de suite sans pousser le footer
+        list.insertAdjacentHTML('afterbegin', progressHtml);
 
         progressHtml = `
             <div style="padding:15px; background:var(--bg-secondary); margin-bottom:15px; border-radius:4px; font-size:0.9rem; border:1px solid var(--border-color); text-align:center;">
@@ -1512,13 +1522,15 @@ function updateCartUI() {
         if (accessory && !isAccessoryInCart && accessory.stock > 0) {
             const sizeRecommendation = triggerItem ? triggerItem.size : (accessory.sizesList[0] || 'TU');
             const phraseAccroche = triggerItem ? `Complétez votre commande de ${triggerItem.model} !` : "Ne manquez pas cet accessoire !";
+            
+            // CORRECTIF : Réduction des paddings et de la taille de l'image pour gagner de la place verticale
             const upsellHtml = `
-                <div style="background:#fff8e1; border:1px solid #ffc107; padding:15px; border-radius:6px; margin-top:15px; display:flex; gap:10px; align-items:center;">
-                    <img src="${accessory.images[0] || 'assets/placeholder.jpg'}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                <div class="cart-upsell-container" style="background:#fff8e1; border:1px solid #ffc107; padding:10px; border-radius:6px; margin-top:10px; display:flex; gap:10px; align-items:center;">
+                    <img src="${accessory.images[0] || 'assets/placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
                     <div style="flex:1;">
-                        <p style="margin:0; font-weight:bold; font-size:0.9rem; color:#111;">${phraseAccroche}</p>
-                        <p style="margin:2px 0 8px; font-size:0.8rem;">Ajouter <strong>${accessory.model}</strong> (${sizeRecommendation}) pour ${formatPrice(accessory.price)}</p>
-                        <button id="add-upsell-btn" data-id="${accessory.id}" data-size="${sizeRecommendation}" style="background:#ffc107; color:#111; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; font-size:0.75rem; cursor:pointer;">Ajouter au Panier</button>
+                        <p style="margin:0; font-weight:bold; font-size:0.85rem; color:#111;">${phraseAccroche}</p>
+                        <p style="margin:2px 0 6px; font-size:0.75rem;">Ajouter <strong>${accessory.model}</strong> (${sizeRecommendation}) pour ${formatPrice(accessory.price)}</p>
+                        <button id="add-upsell-btn" data-id="${accessory.id}" data-size="${sizeRecommendation}" style="background:#ffc107; color:#111; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:0.7rem; cursor:pointer;">Ajouter au Panier</button>
                     </div>
                 </div>
             `;
@@ -1549,14 +1561,16 @@ function updateCartUI() {
         
         if (finalTotal > 0 && finalTotal < 30) {
             const missing = (30 - finalTotal).toFixed(2);
+            // CORRECTIF : Marges réduites (margin-top: 10px au lieu de 15px) et padding optimisé
             paypalHtml = `
-                <div class="paypal-incentive" style="background:#fff9e6; border:1px dashed #ffcc00; padding:10px; border-radius:66px; margin-top:15px; font-size:0.85rem; color:#856404; text-align:center;">
+                <div class="paypal-incentive" style="background:#fff9e6; border:1px dashed #ffcc00; padding:8px 10px; border-radius:6px; margin-top:10px; font-size:0.8rem; color:#856404; text-align:center;">
                     Ajoutez <strong>${missing}€</strong> pour profiter du <strong>Paiement en 4X</strong> sans frais avec PayPal.
                 </div>`;
         } else if (finalTotal >= 30) {
             const monthly = (finalTotal / 4).toFixed(2);
+            // CORRECTIF : Réduction de la taille de police et des marges pour libérer de l'espace vertical
             paypalHtml = `
-                <div class="paypal-incentive" style="background:#e6f3ff; border:1px solid #0070ba; padding:10px; border-radius:6px; margin-top:15px; font-size:0.85rem; color:#003087; text-align:center;">
+                <div class="paypal-incentive" style="background:#e6f3ff; border:1px solid #0070ba; padding:8px 10px; border-radius:6px; margin-top:10px; font-size:0.8rem; color:#003087; text-align:center;">
                     Éligible au <strong>Paiement en 4X</strong> PayPal : 4 mensualités de <strong>${monthly}€</strong>.
                 </div>`;
         }

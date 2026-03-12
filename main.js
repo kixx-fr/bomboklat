@@ -1503,12 +1503,10 @@ function updateCartUI() {
         });
 
         // --- GESTION UPSELL AUTOMATISÉE (2 PRODUITS ALÉATOIRES) ---
-        // 1. On filtre les produits qui ne sont pas déjà dans le panier et qui ont du stock
         const cartIds = state.cart.map(item => item.id);
         const candidates = state.products.filter(p => !cartIds.includes(p.id) && p.stock > 0);
 
         if (candidates.length > 0) {
-            // 2. On mélange et on prend 2 produits au hasard
             const shuffled = candidates.sort(() => 0.5 - Math.random());
             const upsellProducts = shuffled.slice(0, 2);
 
@@ -1519,13 +1517,14 @@ function updateCartUI() {
 
             upsellProducts.forEach(prod => {
                 const prodImg = (prod.images && prod.images[0]) || 'assets/img/placeholder.jpg';
-                // On prend la première taille dispo ou 'TU'
                 const defSize = (prod.sizesList && prod.sizesList.length > 0) ? prod.sizesList[0] : 'TU';
                 
                 upsellHtml += `
                     <div class="upsell-card" style="background:var(--bg-secondary); padding:8px; border-radius:6px; border:1px solid var(--border-color); text-align:center;">
-                        <img src="${prodImg}" style="width:100%; height:80px; object-fit:contain; margin-bottom:5px;">
-                        <div style="font-size:0.75rem; font-weight:700; height:32px; overflow:hidden; line-height:1.1; margin-bottom:4px;">${prod.model}</div>
+                        <div class="upsell-clickable" data-id="${prod.id}" style="cursor:pointer;">
+                            <img src="${prodImg}" style="width:100%; height:80px; object-fit:contain; margin-bottom:5px;">
+                            <div style="font-size:0.75rem; font-weight:700; height:32px; overflow:hidden; line-height:1.1; margin-bottom:4px;">${prod.model}</div>
+                        </div>
                         <div style="font-size:0.8rem; font-weight:800; color:var(--accent-color); margin-bottom:8px;">${formatPrice(prod.price)}</div>
                         <button class="quick-add-upsell" data-id="${prod.id}" data-size="${defSize}" style="width:100%; background:#000; color:#fff; border:none; padding:6px; border-radius:4px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
                             AJOUTER
@@ -1536,10 +1535,21 @@ function updateCartUI() {
             upsellHtml += `</div></div>`;
             list.insertAdjacentHTML('beforeend', upsellHtml);
 
-            // 3. Écouteurs pour les nouveaux boutons
+            // Écouteurs d'événements
             setTimeout(() => {
+                // Gestion du clic sur l'image/titre pour ouvrir la modale
+                document.querySelectorAll('.upsell-clickable').forEach(area => {
+                    area.onclick = () => {
+                        const id = area.getAttribute('data-id');
+                        const fullProduct = state.products.find(p => p.id === id);
+                        if(fullProduct) openProductModal(fullProduct);
+                    };
+                });
+
+                // Gestion du bouton AJOUTER
                 document.querySelectorAll('.quick-add-upsell').forEach(btn => {
-                    btn.onclick = () => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation(); 
                         const id = btn.getAttribute('data-id');
                         const size = btn.getAttribute('data-size');
                         const p = state.products.find(x => x.id === id);

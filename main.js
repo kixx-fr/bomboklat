@@ -1466,7 +1466,7 @@ function updateCartUI() {
             noteFun = `<div style="font-size:0.7rem; font-weight:normal; margin-top:4px; color:#444;">*Confirmé selon votre zone finale.</div>`;
         }
 
-        // CORRECTIF : Réduction des paddings et marges pour mobile
+        // CORRECTIF : On définit le HTML une seule fois et on supprime le doublon d'injection
         progressHtml = `
             <div class="cart-progress-container" style="padding:10px; background:var(--bg-secondary); margin-bottom:10px; border-radius:4px; font-size:0.85rem; border:1px solid var(--border-color); text-align:center;">
                 <div style="margin-bottom:6px;">${message}</div>
@@ -1476,19 +1476,8 @@ function updateCartUI() {
                 ${noteFun}
             </div>`;
         
-        // On l'insère au début de la liste pour qu'elle soit vue de suite sans pousser le footer
+        // On injecte UNE SEULE FOIS au début de la liste
         list.insertAdjacentHTML('afterbegin', progressHtml);
-
-        progressHtml = `
-            <div style="padding:15px; background:var(--bg-secondary); margin-bottom:15px; border-radius:4px; font-size:0.9rem; border:1px solid var(--border-color); text-align:center;">
-                <div style="margin-bottom:8px;">${message}</div>
-                <div style="height:10px; background:#ddd; border-radius:5px; overflow:hidden; border:1px solid rgba(0,0,0,0.05); position:relative;">
-                    <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #00c853, #b2ff59); transition: width 0.8s ease-out;"></div>
-                </div>
-                ${noteFun}
-            </div>`;
-        
-        list.insertAdjacentHTML('beforeend', progressHtml);
 
         // 2. Affichage des produits
         state.cart.forEach((item, idx) => { 
